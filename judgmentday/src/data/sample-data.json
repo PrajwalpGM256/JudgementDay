@@ -1,0 +1,32 @@
+{
+  "teams": [
+    "Cowboys", "Eagles", "Giants", "Commanders",
+    "Packers", "Bears", "Vikings", "Lions",
+    "49ers", "Seahawks", "Rams", "Cardinals",
+    "Chiefs", "Raiders", "Broncos", "Chargers"
+  ],
+  "weeks": [
+    {
+      "week": 1,
+      "games": [
+        { "id": "1", "home": "Cowboys", "away": "Eagles", "time": "Sun 1:00 PM" },
+        { "id": "2", "home": "Packers", "away": "Bears", "time": "Sun 1:00 PM" },
+        { "id": "3", "home": "49ers", "away": "Seahawks", "time": "Sun 4:25 PM" },
+        { "id": "4", "home": "Chiefs", "away": "Raiders", "time": "Sun 4:25 PM" },
+        { "id": "5", "home": "Giants", "away": "Vikings", "time": "Sun 1:00 PM" },
+        { "id": "6", "home": "Rams", "away": "Cardinals", "time": "Sun 4:05 PM" },
+        { "id": "7", "home": "Broncos", "away": "Chargers", "time": "Sun 4:25 PM" },
+        { "id": "8", "home": "Lions", "away": "Commanders", "time": "Sun 1:00 PM" }
+      ]
+    }
+  ],
+  "sampleLeagues": [
+    { "id": "1", "name": "Office League", "members": 12, "commissioner": "John Doe" },
+    { "id": "2", "name": "Friends League", "members": 8, "commissioner": "Jane Smith" }
+  ],
+  "sampleStandings": [
+    { "rank": 1, "user": "AlphaPicker", "wins": 12, "losses": 4, "points": 156 },
+    { "rank": 2, "user": "GridironGuru", "wins": 11, "losses": 5, "points": 143 },
+    { "rank": 3, "user": "TouchdownTom", "wins": 10, "losses": 6, "points": 132 }
+  ]
+}
