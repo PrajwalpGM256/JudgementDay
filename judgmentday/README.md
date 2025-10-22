@@ -1,36 +1,92 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# JudgmentDay - Sports Prediction Platform
 
-## Getting Started
+## Quick Setup Guide
 
-First, run the development server:
+Follow these steps to set up the project on your local machine.
 
+## Prerequisites
+- Git
+- WSL2 (if using Windows)
+
+## Setup Instructions
+
+### Clone the Repository
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/[USERNAME]/project-fall25-PrajwalpGM256.git
+cd project-fall25-PrajwalpGM256/judgmentday
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Get Environment Files
+**Contact the team lead for:**
+- `.env` file
+- `.env.local` file
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Place both files in the root of the `judgmentday` folder.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Install Miniconda & Create Environment
+```bash
+# Install Miniconda
+wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+bash Miniconda3-latest-Linux-x86_64.sh -b
+~/miniconda3/bin/conda init bash
+source ~/.bashrc
 
-## Learn More
+# Create environment
+conda create -n judgmentday nodejs=18 -y
 
-To learn more about Next.js, take a look at the following resources:
+# Activate environment
+conda activate judgmentday
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+**IMPORTANT**: Always activate the environment when working on this project:
+```bash
+conda activate judgmentday
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Install Dependencies
+```bash
+# Make sure you're in the judgmentday directory
+npm install
+```
 
-## Deploy on Vercel
+### Set Up Database
+```bash
+# Generate Prisma Client
+npx prisma generate
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+# Sync with database
+npx prisma db push
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+### 6. Run the Application
+```bash
+npm run dev
+```
+
+Application will be running at: **http://localhost:3000**
+
+## 📍 Access Points
+
+| Service | URL | Description |
+|---------|-----|-------------|
+| **Application** | http://localhost:3000 | Main app |
+| **Prisma Studio** | http://localhost:5555 | Database GUI (`npm run db:studio`) |
+
+## 🔄 Daily Workflow
+```bash
+# Every time you work on the project:
+conda activate judgmentday
+cd judgmentday
+git pull
+npm install  # In case of new dependencies
+npm run dev
+```
+
+## 🆘 Troubleshooting
+
+**Modules not found?**
+```bash
+rm -rf node_modules .next
+npm install
+```
+
