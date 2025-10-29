@@ -16,7 +16,15 @@
         { "id": "5", "home": "Giants", "away": "Vikings", "time": "Sun 1:00 PM" },
         { "id": "6", "home": "Rams", "away": "Cardinals", "time": "Sun 4:05 PM" },
         { "id": "7", "home": "Broncos", "away": "Chargers", "time": "Sun 4:25 PM" },
-        { "id": "8", "home": "Lions", "away": "Commanders", "time": "Sun 1:00 PM" }
+        { "id": "8", "home": "Lions", "away": "Commanders", "time": "Sun 1:00 PM" },
+        { "id": "9", "home": "Eagles", "away": "Giants", "time": "Sun 1:00 PM" },
+        { "id": "10", "home": "Bears", "away": "Lions", "time": "Sun 1:00 PM" },
+        { "id": "11", "home": "Seahawks", "away": "Rams", "time": "Sun 4:05 PM" },
+        { "id": "12", "home": "Raiders", "away": "Broncos", "time": "Sun 4:05 PM" },
+        { "id": "13", "home": "Vikings", "away": "49ers", "time": "Sun 1:00 PM" },
+        { "id": "14", "home": "Cardinals", "away": "Cowboys", "time": "Sun 4:25 PM" },
+        { "id": "15", "home": "Chargers", "away": "Chiefs", "time": "Sun 8:20 PM" },
+        { "id": "16", "home": "Commanders", "away": "Packers", "time": "Mon 8:15 PM" }
       ]
     }
   ],
