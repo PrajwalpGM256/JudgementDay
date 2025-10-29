@@ -89,4 +89,7 @@ npm run dev
 rm -rf node_modules .next
 npm install
 ```
+## Link to wireframe
+
+https://www.figma.com/design/qwO4AwCitaWPWiEMeJCT2G/JudgementDay?node-id=0-1&t=ubbroK396GKiGLhV-1
 
