@@ -8,17 +8,239 @@ datasource db {
 }
 
 model User {
+  id            String        @id @default(cuid())
+  email         String        @unique
+  username      String        @unique
+  password      String
+  role          Role          @default(USER)
+  totalPoints   Int           @default(0)
+  rank          Int?
+  walletBalance Float         @default(50.0)
+  avatarUrl     String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  
+  // Relations
+  userTeams     UserTeam[]
+  leagueMembers LeagueMember[]
+  picks         Pick[]
+  ownedLeagues  League[]      @relation("LeagueCommissioner")
+}
+
+model Team {
+  id           String   @id @default(cuid())
+  name         String   @unique
+  abbreviation String   @unique
+  city         String
+  logoUrl      String?
+  conference   String
+  division     String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  
+  // Relations
+  players      Player[]
+  homeMatches  Match[]  @relation("HomeTeam")
+  awayMatches  Match[]  @relation("AwayTeam")
+}
+
+model Player {
+  id          String   @id @default(cuid())
+  name        String
+  position    Position
+  teamId      String
+  price       Float
+  imageUrl    String?
+  avgPoints   Float    @default(0)
+  jerseyNumber Int?
+  status      PlayerStatus @default(ACTIVE)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations
+  team        Team     @relation(fields: [teamId], references: [id])
+  stats       PlayerStat[]
+  userTeamPlayers UserTeamPlayer[]
+  
+  @@index([teamId])
+  @@index([position])
+}
+
+model Match {
+  id           String      @id @default(cuid())
+  week         Int
+  season       Int
+  homeTeamId   String
+  awayTeamId   String
+  homeScore    Int?
+  awayScore    Int?
+  scheduledAt  DateTime
+  status       MatchStatus @default(SCHEDULED)
+  quarter      String?
+  timeRemaining String?
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  
+  // Relations
+  homeTeam     Team        @relation("HomeTeam", fields: [homeTeamId], references: [id])
+  awayTeam     Team        @relation("AwayTeam", fields: [awayTeamId], references: [id])
+  playerStats  PlayerStat[]
+  userTeams    UserTeam[]
+  picks        Pick[]
+  
+  @@index([week, season])
+  @@index([scheduledAt])
+}
+
+model PlayerStat {
+  id              String   @id @default(cuid())
+  playerId        String
+  matchId         String
+  passingYards    Int      @default(0)
+  passingTDs      Int      @default(0)
+  interceptions   Int      @default(0)
+  rushingYards    Int      @default(0)
+  rushingTDs      Int      @default(0)
+  receptions      Int      @default(0)
+  receivingYards  Int      @default(0)
+  receivingTDs    Int      @default(0)
+  fumbles         Int      @default(0)
+  fgMade          Int      @default(0)
+  fgAttempted     Int      @default(0)
+  defSacks        Int      @default(0)
+  defInterceptions Int     @default(0)
+  defTDs          Int      @default(0)
+  fantasyPoints   Float    @default(0)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  // Relations
+  player          Player   @relation(fields: [playerId], references: [id])
+  match           Match    @relation(fields: [matchId], references: [id])
+  
+  @@unique([playerId, matchId])
+  @@index([matchId])
+}
+
+model UserTeam {
+  id          String   @id @default(cuid())
+  userId      String
+  matchId     String
+  teamName    String?
+  totalCost   Float
+  totalPoints Float    @default(0)
+  rank        Int?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  // Relations
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  match       Match    @relation(fields: [matchId], references: [id])
+  players     UserTeamPlayer[]
+  
+  @@unique([userId, matchId])
+  @@index([matchId])
+}
+
+model UserTeamPlayer {
+  id         String   @id @default(cuid())
+  userTeamId String
+  playerId   String
+  position   Position
+  createdAt  DateTime @default(now())
+  
+  // Relations
+  userTeam   UserTeam @relation(fields: [userTeamId], references: [id], onDelete: Cascade)
+  player     Player   @relation(fields: [playerId], references: [id])
+  
+  @@unique([userTeamId, playerId])
+  @@index([userTeamId])
+}
+
+model League {
+  id            String   @id @default(cuid())
+  name          String
+  description   String?
+  commissionerId String
+  inviteCode    String   @unique
+  isPrivate     Boolean  @default(true)
+  maxMembers    Int      @default(20)
+  season        Int
+  prizePool     Float    @default(0)
+  rules         String?  // JSON string
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  // Relations
+  commissioner  User     @relation("LeagueCommissioner", fields: [commissionerId], references: [id])
+  members       LeagueMember[]
+  
+  @@index([inviteCode])
+  @@index([season])
+}
+
+model LeagueMember {
   id        String   @id @default(cuid())
-  email     String   @unique
-  username  String   @unique
-  password  String
-  role      Role     @default(USER)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  leagueId  String
+  userId    String
+  points    Int      @default(0)
+  rank      Int?
+  joinedAt  DateTime @default(now())
+  
+  // Relations
+  league    League   @relation(fields: [leagueId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@unique([leagueId, userId])
+  @@index([leagueId])
+}
+
+model Pick {
+  id             String   @id @default(cuid())
+  userId         String
+  matchId        String
+  predictedWinner String  // "home" or "away"
+  confidencePoints Int
+  isCorrect      Boolean?
+  pointsEarned   Int      @default(0)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  
+  // Relations
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  match          Match    @relation(fields: [matchId], references: [id])
+  
+  @@unique([userId, matchId])
+  @@index([matchId])
 }
 
 enum Role {
   USER
   COMMISSIONER
   ADMIN
+}
+
+enum Position {
+  QB   // Quarterback
+  RB   // Running Back
+  WR   // Wide Receiver
+  TE   // Tight End
+  K    // Kicker
+  DEF  // Defense
+}
+
+enum PlayerStatus {
+  ACTIVE
+  INJURED
+  SUSPENDED
+  INACTIVE
+}
+
+enum MatchStatus {
+  SCHEDULED
+  LIVE
+  HALFTIME
+  FINAL
+  POSTPONED
+  CANCELLED
 }
