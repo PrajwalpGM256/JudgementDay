@@ -1,4 +1,6 @@
-# JudgmentDay - Sports Prediction Platform
+# JudgmentDay - Fantasy Football Platform
+
+A modern, full-stack fantasy football web application built with Next.js 15, TypeScript, Prisma, and PostgreSQL. Build your fantasy teams, compete with friends, and climb the leaderboard!
 
 ## Quick Setup Guide
 
@@ -92,4 +94,3 @@ npm install
 ## Link to wireframe
 
 https://www.figma.com/design/qwO4AwCitaWPWiEMeJCT2G/JudgementDay?node-id=0-1&t=ubbroK396GKiGLhV-1
-
