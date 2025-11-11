@@ -7,13 +7,22 @@ import { syncMatchFromAPI, fetchLiveScores } from '@/lib/api-football';
 // POST /api/sports/sync - Sync match data from API-FOOTBALL
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession(authOptions);
-
-    if (!session || session.user.role !== 'ADMIN') {
-      return NextResponse.json(
-        { error: 'Unauthorized - Admin only' },
-        { status: 401 }
-      );
+    // Check for API key (for cron jobs) or admin session
+    const apiKey = request.headers.get('x-api-key');
+    const cronSecret = process.env.CRON_SECRET;
+    
+    // Allow access if valid API key OR admin session
+    if (apiKey && cronSecret && apiKey === cronSecret) {
+      // Authenticated via API key (for cron jobs)
+    } else {
+      // Check admin session
+      const session = await getServerSession(authOptions);
+      if (!session || session.user.role !== 'ADMIN') {
+        return NextResponse.json(
+          { error: 'Unauthorized - Admin only or valid API key required' },
+          { status: 401 }
+        );
+      }
     }
 
     const body = await request.json();
