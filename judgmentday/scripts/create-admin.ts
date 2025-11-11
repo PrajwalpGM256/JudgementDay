@@ -28,7 +28,7 @@ async function createAdmin() {
         username: 'admin',
         password: hashedPassword,
         role: 'ADMIN',
-        walletBalance: 50,
+        walletBalance: 75,
         totalPoints: 0,
       },
     });

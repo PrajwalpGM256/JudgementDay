@@ -230,7 +230,7 @@ export default function DashboardPage() {
               <span className="text-yellow-400 text-sm font-semibold">100</span>
             </div>
             <p className="text-gray-300 text-sm mb-1">Wallet Balance</p>
-            <p className="text-3xl font-bold text-white mb-1">50</p>
+            <p className="text-3xl font-bold text-white mb-1">75</p>
             <p className="text-xs text-gray-400">Credits available</p>
           </div>
         </div>

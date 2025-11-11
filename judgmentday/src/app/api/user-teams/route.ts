@@ -121,10 +121,10 @@ export async function POST(request: NextRequest) {
 
     const totalCost = players.reduce((sum, player) => sum + player.price, 0);
 
-    // Check budget (50 credits)
-    if (totalCost > 50) {
+    // Check budget (75 credits)
+    if (totalCost > 75) {
       return NextResponse.json(
-        { error: `Total cost (${totalCost}) exceeds budget of 50 credits` },
+        { error: `Total cost (${totalCost}) exceeds budget of 75 credits` },
         { status: 400 }
       );
     }

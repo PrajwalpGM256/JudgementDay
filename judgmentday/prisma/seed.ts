@@ -79,7 +79,7 @@ async function main() {
       username: 'JohnDoe',
       password: hashedPassword,
       role: 'USER',
-      walletBalance: 50,
+      walletBalance: 75,
       totalPoints: 0,
     },
   });
@@ -90,7 +90,7 @@ async function main() {
       username: 'JaneSmith',
       password: hashedPassword,
       role: 'USER',
-      walletBalance: 50,
+      walletBalance: 75,
       totalPoints: 0,
     },
   });
@@ -101,7 +101,7 @@ async function main() {
       username: 'AdminUser',
       password: hashedPassword,
       role: 'ADMIN',
-      walletBalance: 50,
+      walletBalance: 75,
       totalPoints: 0,
     },
   });

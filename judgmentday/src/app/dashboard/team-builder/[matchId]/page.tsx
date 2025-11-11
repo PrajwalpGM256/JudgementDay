@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { use, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { DollarSign, Users, TrendingUp, AlertCircle, CheckCircle, Trophy } from 'lucide-react';
 import toast from 'react-hot-toast';
@@ -31,10 +31,11 @@ const POSITION_REQUIREMENTS = {
   DEF: { required: 1, label: 'Defense' },
 };
 
-const BUDGET_LIMIT = 50;
+const BUDGET_LIMIT = 75;
 const MAX_PLAYERS_PER_TEAM = 4;
 
-export default function TeamBuilderPage({ params }: { params: { matchId: string } }) {
+export default function TeamBuilderPage({ params }: { params: Promise<{ matchId: string }> }) {
+  const { matchId } = use(params);
   const router = useRouter();
   const [players, setPlayers] = useState<Player[]>([]);
   const [selectedPlayers, setSelectedPlayers] = useState<SelectedPlayer[]>([]);
@@ -153,7 +154,7 @@ export default function TeamBuilderPage({ params }: { params: { matchId: string 
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          matchId: params.matchId,
+          matchId: matchId,
           teamName: teamName || 'My Team',
           players: selectedPlayers.map((p) => ({
             playerId: p.id,

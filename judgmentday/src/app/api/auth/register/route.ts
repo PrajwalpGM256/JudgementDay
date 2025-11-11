@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
         email: validatedData.email,
         username: validatedData.username,
         password: hashedPassword,
-        walletBalance: 50, // Starting balance
+        walletBalance: 75, // Starting balance
       },
       select: {
         id: true,
