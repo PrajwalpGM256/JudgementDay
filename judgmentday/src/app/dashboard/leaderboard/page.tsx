@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import Navbar from '@/components/layout/Navbar';
 import { Trophy, Medal, TrendingUp, Users, Award } from 'lucide-react';
 
 interface LeaderboardEntry {
@@ -64,6 +65,8 @@ export default function LeaderboardPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800">
+      <Navbar />
+      
       {/* Header */}
       <div className="bg-black/20 backdrop-blur-md border-b border-white/10 py-6">
         <div className="container mx-auto px-6">

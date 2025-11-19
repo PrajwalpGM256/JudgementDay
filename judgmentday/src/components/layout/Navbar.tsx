@@ -1,53 +1,88 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useSession, signOut } from "next-auth/react";
+import { Scale, Home, Trophy, Calendar, LogOut, User } from "lucide-react";
 
-interface NavbarProps {
-  userName?: string;
-  onLogout?: () => void;
-}
-
-export default function Navbar({ userName, onLogout }: NavbarProps) {
+export default function Navbar() {
   const pathname = usePathname();
+  const { data: session } = useSession();
 
   const isActive = (path: string) => pathname === path;
 
+  const handleSignOut = () => {
+    signOut({ callbackUrl: '/' });
+  };
+
   return (
-    <nav className="bg-slate-900 shadow-lg border-b border-slate-700">
-      <div className="container mx-auto px-4 py-4">
+    <nav className="bg-black/20 backdrop-blur-md border-b border-white/10">
+      <div className="container mx-auto px-6 py-5">
         <div className="flex justify-between items-center">
           <div className="flex items-center space-x-8">
-            <Link href="/dashboard" className="text-2xl font-bold text-white">
-              ⚖️ JudgmentDay
+            <Link href="/dashboard" className="flex items-center space-x-3">
+              <div className="p-2 bg-gradient-to-br from-amber-400 to-orange-500 rounded-lg shadow-lg">
+                <Scale className="h-6 w-6 text-slate-900" />
+              </div>
+              <span className="text-2xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+                JudgmentDay
+              </span>
             </Link>
-            <div className="flex space-x-6">
+            <div className="flex space-x-8">
               <Link 
                 href="/dashboard" 
-                className={isActive("/dashboard") ? "text-yellow-400 font-semibold" : "text-gray-300 hover:text-yellow-400 font-medium"}
+                className={`flex items-center space-x-2 transition-colors ${
+                  isActive("/dashboard") 
+                    ? "text-amber-400 font-semibold" 
+                    : "text-gray-300 hover:text-white"
+                }`}
               >
-                Dashboard
+                <Home className="h-4 w-4" />
+                <span>Dashboard</span>
+              </Link>
+              <Link 
+                href="/dashboard/matches" 
+                className={`flex items-center space-x-2 transition-colors ${
+                  isActive("/dashboard/matches") 
+                    ? "text-amber-400 font-semibold" 
+                    : "text-gray-300 hover:text-white"
+                }`}
+              >
+                <Calendar className="h-4 w-4" />
+                <span>Matches</span>
               </Link>
               <Link 
                 href="/dashboard/leagues" 
-                className={isActive("/dashboard/leagues") ? "text-yellow-400 font-semibold" : "text-gray-300 hover:text-yellow-400 font-medium"}
+                className={`flex items-center space-x-2 transition-colors ${
+                  isActive("/dashboard/leagues") 
+                    ? "text-amber-400 font-semibold" 
+                    : "text-gray-300 hover:text-white"
+                }`}
               >
-                Leagues
-              </Link>
-              <Link 
-                href="/dashboard/picks" 
-                className={isActive("/dashboard/picks") ? "text-yellow-400 font-semibold" : "text-gray-300 hover:text-yellow-400 font-medium"}
-              >
-                Make Picks
+                <Trophy className="h-4 w-4" />
+                <span>Leagues</span>
               </Link>
             </div>
           </div>
           <div className="flex items-center space-x-4">
-            {userName && <span className="text-gray-200 font-medium">{userName}</span>}
+            <div className="flex items-center space-x-3 px-4 py-2 bg-white/5 rounded-lg">
+              <User className="h-4 w-4 text-gray-300" />
+              <span className="text-gray-300">{session?.user?.name || 'User'}</span>
+            </div>
+            {session?.user?.role === 'ADMIN' && (
+              <Link
+                href="/admin"
+                className="flex items-center space-x-2 px-4 py-2 bg-purple-500/20 text-purple-400 rounded-lg hover:bg-purple-500/30 transition-colors"
+              >
+                <Trophy className="h-4 w-4" />
+                <span>Admin</span>
+              </Link>
+            )}
             <button 
-              onClick={onLogout}
-              className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 font-medium"
+              onClick={handleSignOut}
+              className="flex items-center space-x-2 px-4 py-2 bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500/30 transition-colors"
             >
-              Logout
+              <LogOut className="h-4 w-4" />
+              <span>Logout</span>
             </button>
           </div>
         </div>

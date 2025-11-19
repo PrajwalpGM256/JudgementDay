@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import Navbar from '@/components/layout/Navbar';
 import { Calendar, Clock, Users, Trophy, ChevronRight } from 'lucide-react';
 import { format } from 'date-fns';
 
@@ -60,6 +61,8 @@ export default function MatchesPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800">
+      <Navbar />
+      
       {/* Header */}
       <div className="bg-black/20 backdrop-blur-md border-b border-white/10 py-6">
         <div className="container mx-auto px-6">

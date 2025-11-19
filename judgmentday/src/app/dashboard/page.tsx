@@ -1,21 +1,17 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useSession, signOut } from 'next-auth/react';
+import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Navbar from '@/components/layout/Navbar';
 import {
-  Scale,
-  Home,
-  Trophy,
-  Target,
-  LogOut,
-  User,
   TrendingUp,
   Award,
   Calendar,
   Users,
-  Clock,
+  Target,
+  Trophy,
 } from 'lucide-react';
 
 interface League {
@@ -91,10 +87,6 @@ export default function DashboardPage() {
     }
   };
 
-  const handleSignOut = () => {
-    signOut({ callbackUrl: '/' });
-  };
-
   if (status === 'loading' || loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 flex items-center justify-center">
@@ -105,75 +97,7 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800">
-      {/* Navigation */}
-      <nav className="bg-black/20 backdrop-blur-md border-b border-white/10">
-        <div className="container mx-auto px-6 py-5">
-          <div className="flex justify-between items-center">
-            <div className="flex items-center space-x-8">
-              <Link href="/dashboard" className="flex items-center space-x-3">
-                <div className="p-2 bg-gradient-to-br from-amber-400 to-orange-500 rounded-lg shadow-lg">
-                  <Scale className="h-6 w-6 text-slate-900" />
-                </div>
-                <span className="text-2xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
-                  JudgmentDay
-                </span>
-              </Link>
-              <div className="flex space-x-8">
-                <Link
-                  href="/dashboard"
-                  className="flex items-center space-x-2 text-amber-400 font-semibold"
-                >
-                  <Home className="h-4 w-4" />
-                  <span>Dashboard</span>
-                </Link>
-                <Link
-                  href="/dashboard/matches"
-                  className="flex items-center space-x-2 text-gray-300 hover:text-white transition-colors"
-                >
-                  <Calendar className="h-4 w-4" />
-                  <span>Matches</span>
-                </Link>
-                <Link
-                  href="/dashboard/leagues"
-                  className="flex items-center space-x-2 text-gray-300 hover:text-white transition-colors"
-                >
-                  <Trophy className="h-4 w-4" />
-                  <span>Leagues</span>
-                </Link>
-                <Link
-                  href="/dashboard/leaderboard"
-                  className="flex items-center space-x-2 text-gray-300 hover:text-white transition-colors"
-                >
-                  <Target className="h-4 w-4" />
-                  <span>Leaderboard</span>
-                </Link>
-              </div>
-            </div>
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-3 px-4 py-2 bg-white/5 rounded-lg">
-                <User className="h-4 w-4 text-gray-300" />
-                <span className="text-gray-300">{session?.user?.name || 'User'}</span>
-              </div>
-              {session?.user?.role === 'ADMIN' && (
-                <Link
-                  href="/admin"
-                  className="flex items-center space-x-2 px-4 py-2 bg-purple-500/20 text-purple-400 rounded-lg hover:bg-purple-500/30 transition-colors"
-                >
-                  <Trophy className="h-4 w-4" />
-                  <span>Admin</span>
-                </Link>
-              )}
-              <button
-                onClick={handleSignOut}
-                className="flex items-center space-x-2 px-4 py-2 bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500/30 transition-colors"
-              >
-                <LogOut className="h-4 w-4" />
-                <span>Logout</span>
-              </button>
-            </div>
-          </div>
-        </div>
-      </nav>
+      <Navbar />
 
       {/* Main Content */}
       <div className="container mx-auto px-6 py-8">
