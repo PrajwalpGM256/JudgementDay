@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { Shield, Calendar, Users, TrendingUp, Database, RefreshCw } from 'lucide-react';
@@ -10,6 +10,7 @@ export default function AdminPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [statsLoading, setStatsLoading] = useState(true);
   const [stats, setStats] = useState({
     totalUsers: 0,
     totalMatches: 0,
@@ -17,14 +18,38 @@ export default function AdminPage() {
     activeTeams: 0,
   });
 
+  const fetchAdminStats = useCallback(async () => {
+    setStatsLoading(true);
+    try {
+      const response = await fetch('/api/admin/stats');
+      if (!response.ok) throw new Error('Failed to fetch stats');
+      
+      const data = await response.json();
+      setStats({
+        totalUsers: data.totalUsers || 0,
+        totalMatches: data.totalMatches || 0,
+        totalPlayers: data.totalPlayers || 0,
+        activeTeams: data.activeTeams || 0,
+      });
+    } catch (error: any) {
+      console.error('Error fetching admin stats:', error);
+      toast.error('Failed to load statistics');
+    } finally {
+      setStatsLoading(false);
+    }
+  }, []);
+
   useEffect(() => {
     if (status === 'unauthenticated') {
       router.push('/auth/login');
     } else if (session?.user?.role !== 'ADMIN') {
       toast.error('Access denied. Admin only.');
       router.push('/dashboard');
+    } else if (status === 'authenticated' && session?.user?.role === 'ADMIN') {
+      // Fetch admin stats when authenticated
+      fetchAdminStats();
     }
-  }, [session, status, router]);
+  }, [session, status, router, fetchAdminStats]);
 
   const handleScoreUpdate = async (matchId: string) => {
     setLoading(true);
@@ -75,6 +100,17 @@ export default function AdminPage() {
 
       <div className="container mx-auto px-6 py-8">
         {/* Stats Grid */}
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl font-bold text-white">Dashboard Statistics</h2>
+          <button
+            onClick={fetchAdminStats}
+            disabled={statsLoading}
+            className="flex items-center space-x-2 px-4 py-2 bg-amber-500/20 text-amber-400 rounded-lg hover:bg-amber-500/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <RefreshCw className={`h-4 w-4 ${statsLoading ? 'animate-spin' : ''}`} />
+            <span>Refresh</span>
+          </button>
+        </div>
         <div className="grid md:grid-cols-4 gap-6 mb-12">
           <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6">
             <div className="flex items-center justify-between mb-4">
@@ -112,85 +148,6 @@ export default function AdminPage() {
             <p className="text-sm text-gray-400">Fantasy Teams</p>
           </div>
         </div>
-
-        {/* Quick Actions */}
-        <div className="grid md:grid-cols-2 gap-8">
-          {/* Scoring Management */}
-          <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8">
-            <div className="flex items-center space-x-3 mb-6">
-              <RefreshCw className="h-6 w-6 text-amber-400" />
-              <h2 className="text-2xl font-bold text-white">Scoring Management</h2>
-            </div>
-
-            <p className="text-gray-300 mb-6">
-              Update fantasy points for matches based on player statistics. This will recalculate
-              all user team scores and update the leaderboard.
-            </p>
-
-            <div className="space-y-4">
-              <div className="p-4 bg-white/5 rounded-xl border border-white/10">
-                <h3 className="text-white font-semibold mb-2">Manual Score Update</h3>
-                <p className="text-sm text-gray-400 mb-4">
-                  Trigger scoring calculation for all matches with player stats
-                </p>
-                <button
-                  onClick={() => handleScoreUpdate('all')}
-                  disabled={loading}
-                  className="px-6 py-3 bg-gradient-to-r from-amber-400 to-orange-500 text-slate-900 font-bold rounded-lg hover:from-amber-300 hover:to-orange-400 transition-all duration-200 disabled:opacity-50"
-                >
-                  {loading ? 'Updating...' : 'Update All Scores'}
-                </button>
-              </div>
-
-              <div className="p-4 bg-blue-500/10 rounded-xl border border-blue-500/30">
-                <h3 className="text-blue-400 font-semibold mb-2">Automatic Updates</h3>
-                <p className="text-sm text-gray-300">
-                  In production, set up a cron job or serverless function to automatically update
-                  scores every 5-10 minutes during game time.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Data Management */}
-          <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8">
-            <div className="flex items-center space-x-3 mb-6">
-              <Database className="h-6 w-6 text-amber-400" />
-              <h2 className="text-2xl font-bold text-white">Data Management</h2>
-            </div>
-
-            <p className="text-gray-300 mb-6">
-              Manage matches, players, and teams. Use the Prisma Studio or API endpoints to add new
-              data.
-            </p>
-
-            <div className="space-y-3">
-              <div className="p-4 bg-white/5 rounded-xl border border-white/10">
-                <h3 className="text-white font-semibold mb-2">Prisma Studio</h3>
-                <p className="text-sm text-gray-400 mb-3">
-                  Run <code className="text-amber-400">npm run db:studio</code> to open Prisma
-                  Studio for database management
-                </p>
-              </div>
-
-              <div className="p-4 bg-white/5 rounded-xl border border-white/10">
-                <h3 className="text-white font-semibold mb-2">Seed Database</h3>
-                <p className="text-sm text-gray-400 mb-3">
-                  Run <code className="text-amber-400">npm run db:seed</code> to populate with demo
-                  data
-                </p>
-              </div>
-
-              <div className="p-4 bg-white/5 rounded-xl border border-white/10">
-                <h3 className="text-white font-semibold mb-2">API Integration</h3>
-                <p className="text-sm text-gray-400">
-                  Configure external sports API in environment variables to fetch live player stats
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-
         {/* API Endpoints Reference */}
         <div className="mt-8 bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8">
           <h2 className="text-2xl font-bold text-white mb-6">Admin API Endpoints</h2>
