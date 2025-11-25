@@ -7,6 +7,8 @@ import {
   updateUserTeamPoints,
   updateUserTotalPoints,
   updateLeaderboard,
+  updateLeagueMemberPoints,
+  distributeLeaguePrizes,
 } from '@/lib/scoring';
 
 // POST /api/scoring/update - Update scoring for a match (Admin only)
@@ -51,6 +53,12 @@ export async function POST(request: NextRequest) {
 
     // Step 5: Update global leaderboard rankings
     await updateLeaderboard(prisma);
+
+    // Step 6: Update league member points based on their teams
+    await updateLeagueMemberPoints(prisma, matchId);
+
+    // Step 7: Rank league members and distribute prizes
+    await distributeLeaguePrizes(prisma, matchId);
 
     return NextResponse.json({
       message: 'Scoring updated successfully',

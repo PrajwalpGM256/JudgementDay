@@ -51,6 +51,7 @@ export async function POST(request: NextRequest) {
         username: validatedData.username,
         password: hashedPassword,
         walletBalance: 75, // Starting balance
+        credits: 1000, // Starting credits for league entry fees
       },
       select: {
         id: true,
@@ -58,6 +59,7 @@ export async function POST(request: NextRequest) {
         username: true,
         role: true,
         walletBalance: true,
+        credits: true,
         createdAt: true,
       },
     });

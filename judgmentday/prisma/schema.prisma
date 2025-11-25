@@ -17,6 +17,7 @@ model User {
   totalPoints   Int           @default(0)
   rank          Int?
   walletBalance Float         @default(75.0)
+  credits       Int           @default(1000)
   avatarUrl     String?
   createdAt     DateTime      @default(now())
   updatedAt     DateTime      @updatedAt
@@ -88,6 +89,7 @@ model Match {
   playerStats  PlayerStat[]
   userTeams    UserTeam[]
   picks        Pick[]
+  leagues      League[]
   
   @@index([week, season])
   @@index([scheduledAt])
@@ -138,9 +140,10 @@ model UserTeam {
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   match       Match    @relation(fields: [matchId], references: [id])
   players     UserTeamPlayer[]
+  leagueMembers LeagueMember[]
   
-  @@unique([userId, matchId])
   @@index([matchId])
+  @@index([userId, matchId])
 }
 
 model UserTeamPlayer {
@@ -159,41 +162,48 @@ model UserTeamPlayer {
 }
 
 model League {
-  id            String   @id @default(cuid())
-  name          String
-  description   String?
-  commissionerId String
-  inviteCode    String   @unique
-  isPrivate     Boolean  @default(true)
-  maxMembers    Int      @default(20)
-  season        Int
-  prizePool     Float    @default(0)
-  rules         String?  // JSON string
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  id                String   @id @default(cuid())
+  name              String
+  description       String?
+  commissionerId    String
+  matchId           String
+  inviteCode        String   @unique
+  isPrivate         Boolean  @default(true)
+  maxMembers        Int      @default(20)
+  entryFee          Int      @default(0)
+  basePrizePool     Int      @default(0)
+  prizeDistribution Json?    // Array of {rank: number, amount: number}
+  rules             String?  // JSON string
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
   
   // Relations
-  commissioner  User     @relation("LeagueCommissioner", fields: [commissionerId], references: [id])
-  members       LeagueMember[]
+  commissioner      User     @relation("LeagueCommissioner", fields: [commissionerId], references: [id])
+  match             Match    @relation(fields: [matchId], references: [id])
+  members           LeagueMember[]
   
   @@index([inviteCode])
-  @@index([season])
+  @@index([matchId])
 }
 
 model LeagueMember {
   id        String   @id @default(cuid())
   leagueId  String
   userId    String
+  userTeamId String  // The team the user is using for this league
   points    Int      @default(0)
   rank      Int?
   joinedAt  DateTime @default(now())
+  prizesWon Int      @default(0)
   
   // Relations
   league    League   @relation(fields: [leagueId], references: [id], onDelete: Cascade)
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userTeam  UserTeam @relation(fields: [userTeamId], references: [id], onDelete: Cascade)
   
   @@unique([leagueId, userId])
   @@index([leagueId])
+  @@index([userTeamId])
 }
 
 model Pick {

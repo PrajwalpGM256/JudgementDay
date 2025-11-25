@@ -80,6 +80,7 @@ async function main() {
       password: hashedPassword,
       role: 'USER',
       walletBalance: 75,
+      credits: 1000,
       totalPoints: 0,
     },
   });
@@ -91,6 +92,7 @@ async function main() {
       password: hashedPassword,
       role: 'USER',
       walletBalance: 75,
+      credits: 1000,
       totalPoints: 0,
     },
   });
@@ -102,6 +104,7 @@ async function main() {
       password: hashedPassword,
       role: 'ADMIN',
       walletBalance: 75,
+      credits: 1000,
       totalPoints: 0,
     },
   });

@@ -2,17 +2,71 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
-import { Scale, Home, Trophy, Calendar, LogOut, User } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Scale, Home, Trophy, Calendar, LogOut, User, Coins } from "lucide-react";
 
 export default function Navbar() {
   const pathname = usePathname();
-  const { data: session } = useSession();
+  const { data: session, status } = useSession();
+  const [credits, setCredits] = useState<number>(0);
+  const [creditsLoading, setCreditsLoading] = useState(true);
 
   const isActive = (path: string) => pathname === path;
 
   const handleSignOut = () => {
     signOut({ callbackUrl: '/' });
   };
+
+  const fetchCredits = async () => {
+    if (!session?.user) {
+      setCreditsLoading(false);
+      return;
+    }
+    
+    try {
+      setCreditsLoading(true);
+      const response = await fetch('/api/user/credits', {
+        method: 'GET',
+        credentials: 'include',
+        cache: 'no-store',
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        const creditsValue = data.credits !== undefined && data.credits !== null 
+          ? Number(data.credits) 
+          : 1000; // Default to 1000 if not set
+        setCredits(creditsValue);
+      } else {
+        console.error('Failed to fetch credits:', response.status);
+        setCredits(1000); // Default fallback
+      }
+    } catch (error) {
+      console.error('Error fetching credits:', error);
+      setCredits(1000); // Default fallback
+    } finally {
+      setCreditsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (status === 'authenticated' && session?.user) {
+      fetchCredits();
+    } else if (status === 'unauthenticated') {
+      setCredits(0);
+      setCreditsLoading(false);
+    }
+  }, [status, session?.user?.id]);
+
+  // Listen for credit update events
+  useEffect(() => {
+    const handleCreditsUpdate = () => {
+      fetchCredits();
+    };
+
+    window.addEventListener('creditsUpdated', handleCreditsUpdate);
+    return () => window.removeEventListener('creditsUpdated', handleCreditsUpdate);
+  }, [session]);
 
   return (
     <nav className="bg-black/20 backdrop-blur-md border-b border-white/10">
@@ -64,6 +118,21 @@ export default function Navbar() {
             </div>
           </div>
           <div className="flex items-center space-x-4">
+            {session && (
+              <div className="flex items-center space-x-2 px-4 py-2 bg-amber-500/20 border border-amber-500/30 rounded-lg">
+                <Coins className="h-4 w-4 text-amber-400" />
+                {creditsLoading ? (
+                  <span className="text-amber-400/70 text-sm">...</span>
+                ) : (
+                  <>
+                    <span className="text-amber-400 font-semibold">
+                      {credits.toLocaleString()}
+                    </span>
+                    <span className="text-amber-300/70 text-sm">credits</span>
+                  </>
+                )}
+              </div>
+            )}
             <div className="flex items-center space-x-3 px-4 py-2 bg-white/5 rounded-lg">
               <User className="h-4 w-4 text-gray-300" />
               <span className="text-gray-300">{session?.user?.name || 'User'}</span>

@@ -207,3 +207,151 @@ export async function updateLeaderboard(prisma: any): Promise<void> {
   }
 }
 
+/**
+ * Update league member points based on their user teams for a match
+ */
+export async function updateLeagueMemberPoints(
+  prisma: any,
+  matchId: string
+): Promise<void> {
+  // Get all leagues for this match
+  const leagues = await prisma.league.findMany({
+    where: { matchId },
+    include: {
+      members: {
+        include: {
+          userTeam: {
+            select: {
+              id: true,
+              totalPoints: true,
+            },
+          },
+        },
+      },
+    },
+  });
+
+  // Update points for each league member based on their user team's points
+  for (const league of leagues) {
+    for (const member of league.members) {
+      if (member.userTeam) {
+        await prisma.leagueMember.update({
+          where: { id: member.id },
+          data: {
+            points: Math.round(member.userTeam.totalPoints),
+          },
+        });
+      }
+    }
+  }
+}
+
+/**
+ * Rank league members within each league and distribute prizes
+ */
+export async function distributeLeaguePrizes(
+  prisma: any,
+  matchId: string
+): Promise<void> {
+  // Get all leagues for this match with their prize distributions
+  const leagues = await prisma.league.findMany({
+    where: { matchId },
+    include: {
+      members: {
+        include: {
+          user: {
+            select: {
+              id: true,
+              credits: true,
+            },
+          },
+          userTeam: {
+            select: {
+              totalPoints: true,
+            },
+          },
+        },
+        orderBy: {
+          points: 'desc',
+        },
+      },
+    },
+  });
+
+  for (const league of leagues) {
+    if (!league.prizeDistribution || league.members.length === 0) {
+      continue;
+    }
+
+    const prizeDistribution = league.prizeDistribution as Array<{ rank: number; amount: number }>;
+    
+    // Sort members by points (descending) and assign ranks
+    const sortedMembers = [...league.members].sort((a, b) => {
+      // Use userTeam points as the primary sort, fallback to member points
+      const aPoints = a.userTeam?.totalPoints || a.points;
+      const bPoints = b.userTeam?.totalPoints || b.points;
+      return bPoints - aPoints;
+    });
+
+    // Update ranks for all members
+    const updatePromises = sortedMembers.map((member, index) => {
+      return prisma.leagueMember.update({
+        where: { id: member.id },
+        data: { rank: index + 1 },
+      });
+    });
+    await Promise.all(updatePromises);
+
+    // Distribute prizes based on prizeDistribution
+    const creditUpdates: Array<{ userId: string; amount: number }> = [];
+    const prizesWonUpdates: Array<{ memberId: string; amount: number }> = [];
+
+    for (const prize of prizeDistribution) {
+      // Find member at this rank (1-indexed)
+      const member = sortedMembers[prize.rank - 1];
+      
+      if (member && prize.amount > 0) {
+        creditUpdates.push({
+          userId: member.user.id,
+          amount: prize.amount,
+        });
+        
+        prizesWonUpdates.push({
+          memberId: member.id,
+          amount: prize.amount,
+        });
+      }
+    }
+
+    // Update user credits in a transaction
+    if (creditUpdates.length > 0) {
+      await prisma.$transaction(
+        creditUpdates.map((update) =>
+          prisma.user.update({
+            where: { id: update.userId },
+            data: {
+              credits: {
+                increment: update.amount,
+              },
+            },
+          })
+        )
+      );
+    }
+
+    // Update prizesWon for league members
+    if (prizesWonUpdates.length > 0) {
+      await prisma.$transaction(
+        prizesWonUpdates.map((update) =>
+          prisma.leagueMember.update({
+            where: { id: update.memberId },
+            data: {
+              prizesWon: update.amount,
+            },
+          })
+        )
+      );
+    }
+  }
+}
+
