@@ -3,7 +3,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import { useEffect, useState } from "react";
-import { Scale, Home, Trophy, Calendar, LogOut, User, Coins } from "lucide-react";
+import { Scale, Home, Trophy, Calendar, LogOut, User, Coins, Shield } from "lucide-react";
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -114,6 +114,17 @@ export default function Navbar() {
               >
                 <Trophy className="h-4 w-4" />
                 <span>Leagues</span>
+              </Link>
+              <Link 
+                href="/dashboard/teams" 
+                className={`flex items-center space-x-2 transition-colors ${
+                  isActive("/dashboard/teams") 
+                    ? "text-amber-400 font-semibold" 
+                    : "text-gray-300 hover:text-white"
+                }`}
+              >
+                <Shield className="h-4 w-4" />
+                <span>Teams</span>
               </Link>
             </div>
           </div>
