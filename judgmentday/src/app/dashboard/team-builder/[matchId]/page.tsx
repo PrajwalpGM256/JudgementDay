@@ -44,17 +44,65 @@ export default function TeamBuilderPage({ params }: { params: Promise<{ matchId:
   const [submitting, setSubmitting] = useState(false);
   const [filterPosition, setFilterPosition] = useState<string>('all');
   const [teamName, setTeamName] = useState('');
+  const [match, setMatch] = useState<any>(null);
 
   useEffect(() => {
-    fetchPlayers();
-  }, [filterPosition]);
+    fetchMatchAndPlayers();
+  }, [matchId]);
 
-  const fetchPlayers = async () => {
+  useEffect(() => {
+    if (match) {
+      fetchPlayersForMatch();
+    }
+  }, [filterPosition, match]);
+
+  const fetchMatchAndPlayers = async () => {
     try {
-      const positionParam = filterPosition !== 'all' ? `?position=${filterPosition}` : '';
-      const response = await fetch(`/api/players${positionParam}`);
-      const data = await response.json();
-      setPlayers(data.players || []);
+      setLoading(true);
+      // First, fetch the match details to get the teams
+      const matchResponse = await fetch(`/api/matches/${matchId}`);
+      if (!matchResponse.ok) {
+        throw new Error('Failed to fetch match details');
+      }
+      const matchData = await matchResponse.json();
+      setMatch(matchData.match);
+    } catch (error) {
+      console.error('Error fetching match:', error);
+      toast.error('Failed to load match details');
+      setLoading(false);
+    }
+  };
+
+  const fetchPlayersForMatch = async () => {
+    try {
+      if (!match) return;
+
+      // Fetch players from both teams playing in this match
+      const homeTeamId = match.homeTeam.id;
+      const awayTeamId = match.awayTeam.id;
+
+      // Fetch home team players
+      const homeResponse = await fetch(`/api/teams/${homeTeamId}/players`);
+      const homeData = await homeResponse.json();
+      const homePlayers = homeData.players || [];
+
+      // Fetch away team players
+      const awayResponse = await fetch(`/api/teams/${awayTeamId}/players`);
+      const awayData = await awayResponse.json();
+      const awayPlayers = awayData.players || [];
+
+      // Combine both teams' players
+      const allMatchPlayers = [...homePlayers, ...awayPlayers];
+
+      // Filter to only show ACTIVE players
+      const activePlayers = allMatchPlayers.filter(p => p.status === 'ACTIVE');
+
+      // Apply position filter if selected
+      const filteredPlayers = filterPosition !== 'all' 
+        ? activePlayers.filter(p => p.position === filterPosition)
+        : activePlayers;
+
+      setPlayers(filteredPlayers);
     } catch (error) {
       console.error('Error fetching players:', error);
       toast.error('Failed to load players');
@@ -186,8 +234,41 @@ export default function TeamBuilderPage({ params }: { params: Promise<{ matchId:
       {/* Header */}
       <div className="bg-black/20 backdrop-blur-md border-b border-white/10 py-6">
         <div className="container mx-auto px-6">
-          <h1 className="text-4xl font-bold text-white mb-2">Build Your Team</h1>
-          <p className="text-gray-300">Select your fantasy lineup within budget</p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-4xl font-bold text-white mb-2">Build Your Team</h1>
+              {match ? (
+                <div className="flex items-center space-x-3 text-gray-300">
+                  <span className="font-semibold text-amber-400">{match.awayTeam.name}</span>
+                  <span>@</span>
+                  <span className="font-semibold text-amber-400">{match.homeTeam.name}</span>
+                  <span>•</span>
+                  <span>Week {match.week}, {match.season}</span>
+                </div>
+              ) : (
+                <p className="text-gray-300">Select your fantasy lineup within budget</p>
+              )}
+            </div>
+            {match && (
+              <div className="flex items-center space-x-4">
+                <div className="w-14 h-14 bg-white rounded-lg flex items-center justify-center shadow-md">
+                  {match.awayTeam.logoUrl ? (
+                    <img src={match.awayTeam.logoUrl} alt={match.awayTeam.name} className="w-12 h-12 object-contain" />
+                  ) : (
+                    <span className="text-slate-900 font-bold text-sm">{match.awayTeam.abbreviation}</span>
+                  )}
+                </div>
+                <span className="text-xl font-bold text-gray-400">vs</span>
+                <div className="w-14 h-14 bg-white rounded-lg flex items-center justify-center shadow-md">
+                  {match.homeTeam.logoUrl ? (
+                    <img src={match.homeTeam.logoUrl} alt={match.homeTeam.name} className="w-12 h-12 object-contain" />
+                  ) : (
+                    <span className="text-slate-900 font-bold text-sm">{match.homeTeam.abbreviation}</span>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 

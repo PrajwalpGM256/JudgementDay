@@ -40,6 +40,15 @@ export async function GET(
 
     const players = await prisma.player.findMany({
       where,
+      include: {
+        team: {
+          select: {
+            id: true,
+            name: true,
+            abbreviation: true,
+          },
+        },
+      },
       orderBy: [
         { position: 'asc' },
         { jerseyNumber: 'asc' },
