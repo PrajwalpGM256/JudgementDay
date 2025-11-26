@@ -325,6 +325,217 @@ export function getESPNTeamId(abbreviation: string): string | null {
   return ESPN_TEAM_ID_MAP[abbreviation.toUpperCase()] || null;
 }
 
+/**
+ * Interfaces for Match/Game data
+ */
+interface ESPNGame {
+  id: string;
+  uid: string;
+  date: string;
+  name: string;
+  shortName: string;
+  season: {
+    year: number;
+    type: number;
+  };
+  week: {
+    number: number;
+  };
+  status: {
+    type: {
+      id: string;
+      name: string;
+      state: string;
+      completed: boolean;
+      description: string;
+      detail: string;
+      shortDetail: string;
+    };
+  };
+  competitions: Array<{
+    id: string;
+    uid: string;
+    date: string;
+    attendance: number;
+    status: {
+      clock: number;
+      displayClock: string;
+      period: number;
+      type: {
+        id: string;
+        name: string;
+        state: string;
+        completed: boolean;
+      };
+    };
+    competitors: Array<{
+      id: string;
+      uid: string;
+      type: string;
+      order: number;
+      homeAway: string;
+      team: {
+        id: string;
+        abbreviation: string;
+        displayName: string;
+      };
+      score: string;
+    }>;
+  }>;
+}
+
+interface MatchData {
+  espnId: string;
+  week: number;
+  season: number;
+  homeTeamAbbr: string;
+  awayTeamAbbr: string;
+  homeScore?: number;
+  awayScore?: number;
+  scheduledAt: Date;
+  status: 'SCHEDULED' | 'LIVE' | 'HALFTIME' | 'FINAL' | 'POSTPONED' | 'CANCELLED';
+  quarter?: string;
+  timeRemaining?: string;
+}
+
+/**
+ * Fetch NFL schedule for a specific week and season
+ */
+export async function fetchESPNSchedule(season: number, week: number): Promise<MatchData[]> {
+  try {
+    console.log(`🏈 Fetching NFL schedule for ${season} Week ${week}...`);
+    
+    const response = await axios.get(`${ESPN_API_BASE}/scoreboard`, {
+      params: {
+        dates: season, // ESPN uses season year
+        seasontype: 2, // 2 = regular season, 1 = preseason, 3 = postseason
+        week: week,
+      },
+      timeout: 10000,
+    });
+
+    if (!response.data?.events) {
+      console.log('No events found in response');
+      return [];
+    }
+
+    const games: ESPNGame[] = response.data.events;
+    console.log(`✅ Found ${games.length} games for Week ${week}`);
+
+    return games.map((game) => {
+      const competition = game.competitions[0];
+      const homeTeam = competition.competitors.find(c => c.homeAway === 'home');
+      const awayTeam = competition.competitors.find(c => c.homeAway === 'away');
+
+      return {
+        espnId: game.id,
+        week: game.week.number,
+        season: game.season.year,
+        homeTeamAbbr: homeTeam?.team.abbreviation || '',
+        awayTeamAbbr: awayTeam?.team.abbreviation || '',
+        homeScore: homeTeam?.score ? parseInt(homeTeam.score) : undefined,
+        awayScore: awayTeam?.score ? parseInt(awayTeam.score) : undefined,
+        scheduledAt: new Date(game.date),
+        status: mapESPNGameStatus(game.status.type.name),
+        quarter: competition.status.period > 0 ? `${competition.status.period}` : undefined,
+        timeRemaining: competition.status.displayClock !== '0:00' ? competition.status.displayClock : undefined,
+      };
+    });
+  } catch (error: any) {
+    console.error('❌ Error fetching ESPN schedule:', error.message);
+    if (axios.isAxiosError(error) && error.response) {
+      console.error('Response data:', JSON.stringify(error.response.data, null, 2));
+    }
+    throw new Error(`Failed to fetch schedule: ${error.message}`);
+  }
+}
+
+/**
+ * Fetch current NFL scoreboard (all games happening now or today)
+ */
+export async function fetchESPNScoreboard(): Promise<MatchData[]> {
+  try {
+    console.log('🏈 Fetching current NFL scoreboard...');
+    
+    const response = await axios.get(`${ESPN_API_BASE}/scoreboard`, {
+      timeout: 10000,
+    });
+
+    if (!response.data?.events) {
+      return [];
+    }
+
+    const games: ESPNGame[] = response.data.events;
+    console.log(`✅ Found ${games.length} games on scoreboard`);
+
+    return games.map((game) => {
+      const competition = game.competitions[0];
+      const homeTeam = competition.competitors.find(c => c.homeAway === 'home');
+      const awayTeam = competition.competitors.find(c => c.homeAway === 'away');
+
+      return {
+        espnId: game.id,
+        week: game.week.number,
+        season: game.season.year,
+        homeTeamAbbr: homeTeam?.team.abbreviation || '',
+        awayTeamAbbr: awayTeam?.team.abbreviation || '',
+        homeScore: homeTeam?.score ? parseInt(homeTeam.score) : undefined,
+        awayScore: awayTeam?.score ? parseInt(awayTeam.score) : undefined,
+        scheduledAt: new Date(game.date),
+        status: mapESPNGameStatus(game.status.type.name),
+        quarter: competition.status.period > 0 ? `${competition.status.period}` : undefined,
+        timeRemaining: competition.status.displayClock !== '0:00' ? competition.status.displayClock : undefined,
+      };
+    });
+  } catch (error: any) {
+    console.error('❌ Error fetching ESPN scoreboard:', error.message);
+    throw new Error(`Failed to fetch scoreboard: ${error.message}`);
+  }
+}
+
+/**
+ * Fetch entire season schedule
+ */
+export async function fetchESPNSeasonSchedule(season: number): Promise<MatchData[]> {
+  const allMatches: MatchData[] = [];
+  
+  // NFL regular season is typically 18 weeks
+  for (let week = 1; week <= 18; week++) {
+    try {
+      const weekMatches = await fetchESPNSchedule(season, week);
+      allMatches.push(...weekMatches);
+      
+      // Add a small delay between requests to be respectful to ESPN's servers
+      await new Promise(resolve => setTimeout(resolve, 500));
+    } catch (error) {
+      console.error(`Failed to fetch week ${week}:`, error);
+    }
+  }
+  
+  return allMatches;
+}
+
+/**
+ * Map ESPN game status to our MatchStatus enum
+ */
+function mapESPNGameStatus(espnStatus: string): 'SCHEDULED' | 'LIVE' | 'HALFTIME' | 'FINAL' | 'POSTPONED' | 'CANCELLED' {
+  const statusMap: Record<string, 'SCHEDULED' | 'LIVE' | 'HALFTIME' | 'FINAL' | 'POSTPONED' | 'CANCELLED'> = {
+    'STATUS_SCHEDULED': 'SCHEDULED',
+    'STATUS_IN_PROGRESS': 'LIVE',
+    'STATUS_HALFTIME': 'HALFTIME',
+    'STATUS_END_PERIOD': 'LIVE',
+    'STATUS_FINAL': 'FINAL',
+    'STATUS_FINAL_OVERTIME': 'FINAL',
+    'STATUS_POSTPONED': 'POSTPONED',
+    'STATUS_CANCELED': 'CANCELLED',
+    'STATUS_CANCELLED': 'CANCELLED',
+    'STATUS_DELAYED': 'SCHEDULED',
+    'STATUS_SUSPENDED': 'SCHEDULED',
+  };
+
+  return statusMap[espnStatus] || 'SCHEDULED';
+}
+
 // Export types
-export type { TeamData, PlayerData, ESPNTeam, ESPNPlayer };
+export type { TeamData, PlayerData, ESPNTeam, ESPNPlayer, MatchData, ESPNGame };
 

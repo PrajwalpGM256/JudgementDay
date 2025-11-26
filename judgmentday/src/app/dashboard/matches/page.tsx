@@ -29,7 +29,7 @@ interface Match {
 export default function MatchesPage() {
   const [matches, setMatches] = useState<Match[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState<'all' | 'scheduled' | 'live' | 'final'>('scheduled');
+  const [filter, setFilter] = useState<'scheduled' | 'live'>('scheduled');
 
   useEffect(() => {
     fetchMatches();
@@ -38,10 +38,22 @@ export default function MatchesPage() {
   const fetchMatches = async () => {
     try {
       setLoading(true);
-      const statusParam = filter !== 'all' ? `&status=${filter.toUpperCase()}` : '';
+      // Only fetch upcoming matches (SCHEDULED or LIVE)
+      const statusParam = `&status=${filter.toUpperCase()}`;
       const response = await fetch(`/api/matches?${statusParam}`);
       const data = await response.json();
-      setMatches(data.matches || []);
+      
+      // Get current date/time
+      const now = new Date();
+      
+      // Filter to only show future matches (after current time)
+      const upcomingMatches = (data.matches || []).filter((match: Match) => {
+        const matchDate = new Date(match.scheduledAt);
+        // Show matches that are in the future or currently live
+        return (matchDate > now && match.status === 'SCHEDULED') || match.status === 'LIVE';
+      });
+      
+      setMatches(upcomingMatches);
     } catch (error) {
       console.error('Error fetching matches:', error);
     } finally {
@@ -72,21 +84,28 @@ export default function MatchesPage() {
       </div>
 
       <div className="container mx-auto px-6 py-8">
-        {/* Filter Tabs */}
+        {/* Filter Tabs - Only show upcoming matches */}
         <div className="flex space-x-4 mb-8">
-          {['all', 'scheduled', 'live', 'final'].map((tab) => (
-            <button
-              key={tab}
-              onClick={() => setFilter(tab as typeof filter)}
-              className={`px-6 py-2 rounded-lg font-semibold transition-all duration-200 ${
-                filter === tab
-                  ? 'bg-gradient-to-r from-amber-400 to-orange-500 text-slate-900'
-                  : 'bg-white/5 text-gray-300 hover:bg-white/10'
-              }`}
-            >
-              {tab.charAt(0).toUpperCase() + tab.slice(1)}
-            </button>
-          ))}
+          <button
+            onClick={() => setFilter('scheduled')}
+            className={`px-6 py-2 rounded-lg font-semibold transition-all duration-200 ${
+              filter === 'scheduled'
+                ? 'bg-gradient-to-r from-amber-400 to-orange-500 text-slate-900'
+                : 'bg-white/5 text-gray-300 hover:bg-white/10'
+            }`}
+          >
+            Upcoming Matches
+          </button>
+          <button
+            onClick={() => setFilter('live')}
+            className={`px-6 py-2 rounded-lg font-semibold transition-all duration-200 ${
+              filter === 'live'
+                ? 'bg-gradient-to-r from-amber-400 to-orange-500 text-slate-900'
+                : 'bg-white/5 text-gray-300 hover:bg-white/10'
+            }`}
+          >
+            Live Now
+          </button>
         </div>
 
         {/* Matches Grid */}
@@ -98,7 +117,12 @@ export default function MatchesPage() {
         ) : matches.length === 0 ? (
           <div className="text-center py-20">
             <Calendar className="h-16 w-16 text-gray-500 mx-auto mb-4" />
-            <p className="text-gray-300 text-xl">No matches found</p>
+            <p className="text-gray-300 text-xl">
+              {filter === 'live' ? 'No live matches at the moment' : 'No upcoming matches found'}
+            </p>
+            <p className="text-gray-500 text-sm mt-2">
+              Run the populate-matches script to add upcoming NFL games
+            </p>
           </div>
         ) : (
           <div className="grid md:grid-cols-2 gap-6">
