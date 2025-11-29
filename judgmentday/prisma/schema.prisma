@@ -142,8 +142,8 @@ model UserTeam {
   players     UserTeamPlayer[]
   leagueMembers LeagueMember[]
   
+  @@unique([userId, matchId])
   @@index([matchId])
-  @@index([userId, matchId])
 }
 
 model UserTeamPlayer {

@@ -23,6 +23,13 @@ export async function GET(request: NextRequest) {
     
     if (status) {
       where.status = status;
+      
+      // If filtering for SCHEDULED matches, only show future matches
+      if (status === 'SCHEDULED') {
+        where.scheduledAt = {
+          gte: new Date(), // Greater than or equal to current date/time
+        };
+      }
     }
 
     const matches = await prisma.match.findMany({

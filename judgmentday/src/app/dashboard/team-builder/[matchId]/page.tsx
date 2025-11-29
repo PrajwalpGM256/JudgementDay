@@ -219,7 +219,8 @@ export default function TeamBuilderPage({ params }: { params: Promise<{ matchId:
       }
 
       toast.success('Team created successfully!');
-      router.push('/dashboard/matches');
+      // Redirect to team results page to view scores
+      router.push(`/dashboard/team-results/${data.userTeam.id}`);
     } catch (error: any) {
       toast.error(error.message || 'Failed to create team');
     } finally {

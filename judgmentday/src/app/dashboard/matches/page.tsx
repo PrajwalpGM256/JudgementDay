@@ -28,11 +28,15 @@ interface Match {
 
 export default function MatchesPage() {
   const [matches, setMatches] = useState<Match[]>([]);
+  const [pastMatches, setPastMatches] = useState<Match[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingPast, setLoadingPast] = useState(true);
   const [filter, setFilter] = useState<'scheduled' | 'live'>('scheduled');
+  const [showPastMatches, setShowPastMatches] = useState(false);
 
   useEffect(() => {
     fetchMatches();
+    fetchPastMatches();
   }, [filter]);
 
   const fetchMatches = async () => {
@@ -58,6 +62,39 @@ export default function MatchesPage() {
       console.error('Error fetching matches:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchPastMatches = async () => {
+    try {
+      setLoadingPast(true);
+      // Fetch completed matches
+      const response = await fetch('/api/matches?&status=FINAL');
+      const data = await response.json();
+      
+      // Get current date/time and year
+      const now = new Date();
+      const currentYear = now.getFullYear();
+      
+      // Filter to only show past matches from current season and sort by most recent first
+      const completedMatches = (data.matches || [])
+        .filter((match: Match) => {
+          const matchDate = new Date(match.scheduledAt);
+          // Only show matches from current season (year) that are in the past
+          return matchDate <= now && 
+                 match.status === 'FINAL' && 
+                 match.season === currentYear;
+        })
+        .sort((a: Match, b: Match) => {
+          return new Date(b.scheduledAt).getTime() - new Date(a.scheduledAt).getTime();
+        })
+        .slice(0, 30); // Limit to 30 most recent matches from current season
+      
+      setPastMatches(completedMatches);
+    } catch (error) {
+      console.error('Error fetching past matches:', error);
+    } finally {
+      setLoadingPast(false);
     }
   };
 
@@ -216,6 +253,147 @@ export default function MatchesPage() {
             ))}
           </div>
         )}
+
+        {/* Past Matches Section */}
+        <div className="mt-16">
+          {/* Test Mode Banner */}
+          <div className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30 rounded-xl p-4 mb-6">
+            <div className="flex items-center space-x-3">
+              <span className="text-2xl">🧪</span>
+              <div>
+                <h3 className="text-white font-semibold">Test Mode Enabled</h3>
+                <p className="text-sm text-gray-300">
+                  You can build teams for completed matches to test the scoring system. 
+                  Click "Test Team" on any past match to try it out!
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-3xl font-bold text-white">Past Matches (Test Mode)</h2>
+            <button
+              onClick={() => setShowPastMatches(!showPastMatches)}
+              className="px-4 py-2 bg-white/5 text-gray-300 hover:bg-white/10 rounded-lg transition-all duration-200"
+            >
+              {showPastMatches ? 'Hide' : 'Show'} Past Matches
+            </button>
+          </div>
+
+          {showPastMatches && (
+            <>
+              {loadingPast ? (
+                <div className="text-center py-10">
+                  <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-gray-400 border-r-transparent"></div>
+                  <p className="text-gray-400 mt-4">Loading past matches...</p>
+                </div>
+              ) : pastMatches.length === 0 ? (
+                <div className="text-center py-10">
+                  <Calendar className="h-12 w-12 text-gray-500 mx-auto mb-4" />
+                  <p className="text-gray-400">No past matches found</p>
+                </div>
+              ) : (
+                <div className="grid md:grid-cols-2 gap-6">
+                  {pastMatches.map((match) => (
+                    <div
+                      key={match.id}
+                      className="group bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl overflow-hidden hover:bg-white/10 hover:border-white/20 transition-all duration-300"
+                    >
+                      <div className="p-6">
+                        {/* Match Header */}
+                        <div className="flex justify-between items-start mb-4">
+                          <div className="flex items-center space-x-2">
+                            <Trophy className="h-5 w-5 text-gray-400" />
+                            <span className="text-sm font-semibold text-gray-400">
+                              Week {match.week}, {match.season}
+                            </span>
+                          </div>
+                          <span
+                            className={`px-3 py-1 rounded-full text-xs font-bold border ${getStatusBadge(
+                              match.status
+                            )}`}
+                          >
+                            {match.status}
+                          </span>
+                        </div>
+
+                        {/* Teams with Scores */}
+                        <div className="space-y-3 mb-4">
+                          {/* Away Team */}
+                          <div className="flex justify-between items-center">
+                            <div className="flex items-center space-x-3">
+                              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                                <span className="text-white font-bold text-sm">
+                                  {match.awayTeam.abbreviation}
+                                </span>
+                              </div>
+                              <div>
+                                <p className="text-white font-semibold">{match.awayTeam.name}</p>
+                                <p className="text-gray-400 text-xs">Away</p>
+                              </div>
+                            </div>
+                            {match.awayScore !== null && (
+                              <span className={`text-2xl font-bold ${
+                                match.awayScore > (match.homeScore || 0) ? 'text-green-400' : 'text-white'
+                              }`}>
+                                {match.awayScore}
+                              </span>
+                            )}
+                          </div>
+
+                          {/* Home Team */}
+                          <div className="flex justify-between items-center">
+                            <div className="flex items-center space-x-3">
+                              <div className="w-10 h-10 bg-gradient-to-br from-red-500 to-orange-600 rounded-lg flex items-center justify-center">
+                                <span className="text-white font-bold text-sm">
+                                  {match.homeTeam.abbreviation}
+                                </span>
+                              </div>
+                              <div>
+                                <p className="text-white font-semibold">{match.homeTeam.name}</p>
+                                <p className="text-gray-400 text-xs">Home</p>
+                              </div>
+                            </div>
+                            {match.homeScore !== null && (
+                              <span className={`text-2xl font-bold ${
+                                match.homeScore > (match.awayScore || 0) ? 'text-green-400' : 'text-white'
+                              }`}>
+                                {match.homeScore}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Match Info */}
+                        <div className="flex items-center justify-between pt-4 border-t border-white/10">
+                          <div className="flex items-center space-x-4 text-sm text-gray-400">
+                            <div className="flex items-center space-x-1">
+                              <Clock className="h-4 w-4" />
+                              <span>{format(new Date(match.scheduledAt), 'MMM d, h:mm a')}</span>
+                            </div>
+                            <div className="flex items-center space-x-1">
+                              <Users className="h-4 w-4" />
+                              <span>{match.userTeams.length} teams</span>
+                            </div>
+                          </div>
+                          
+                          {/* TEST MODE: Allow building teams for past matches */}
+                          <Link
+                            href={`/dashboard/team-builder/${match.id}`}
+                            className="flex items-center space-x-1 px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-semibold rounded-lg hover:from-purple-400 hover:to-pink-400 transform hover:scale-105 transition-all duration-200"
+                          >
+                            <span>🧪 Test Team</span>
+                            <ChevronRight className="h-4 w-4" />
+                          </Link>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </>
+          )}
+        </div>
       </div>
     </div>
   );

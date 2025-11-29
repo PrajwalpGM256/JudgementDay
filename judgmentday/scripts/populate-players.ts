@@ -63,14 +63,16 @@ async function populatePlayersForTeam(dbTeamId: string, teamAbbr: string, teamNa
 
     for (const espnPlayer of espnPlayers) {
       try {
-        // Map ESPN position to our enum
-        const position = mapESPNPosition(espnPlayer.position);
-
-        // Skip defensive players (we don't use individual defensive players)
-        if (position === 'DEF') {
+        // Skip individual defensive players FIRST (before mapping)
+        // Check the abbreviation property of the position object
+        const posAbbr = espnPlayer.position?.abbreviation || espnPlayer.position || '';
+        if (['DL', 'LB', 'DB', 'S', 'CB', 'DE', 'DT', 'MLB', 'OLB', 'SS', 'FS', 'ILB', 'NT', 'LS'].includes(posAbbr.toUpperCase())) {
           skippedCount++;
           continue;
         }
+
+        // Map ESPN position to our enum (after skipping defensive players)
+        const position = mapESPNPosition(espnPlayer.position);
 
         // Calculate fantasy price
         const price = calculatePlayerPrice(position, espnPlayer.jerseyNumber);
@@ -116,6 +118,48 @@ async function populatePlayersForTeam(dbTeamId: string, teamAbbr: string, teamNa
       } catch (error: any) {
         errors.push(`${espnPlayer.name}: ${error.message}`);
       }
+    }
+
+    // Create or update team defense player
+    console.log(`\n🛡️  Creating team defense player...`);
+    try {
+      // Fetch team to get logo URL
+      const team = await prisma.team.findUnique({
+        where: { id: dbTeamId },
+        select: { logoUrl: true },
+      });
+
+      const defensePlayer = await prisma.player.upsert({
+        where: {
+          id: `${dbTeamId}-defense`,
+        },
+        update: {
+          name: `${teamName} Defense`,
+          position: 'DEF',
+          teamId: dbTeamId,
+          price: 6.0, // Standard price for defense
+          imageUrl: team?.logoUrl || null, // Use team logo for defense
+          jerseyNumber: 0,
+          status: 'ACTIVE',
+          avgPoints: 0,
+        },
+        create: {
+          id: `${dbTeamId}-defense`,
+          name: `${teamName} Defense`,
+          position: 'DEF',
+          teamId: dbTeamId,
+          price: 6.0,
+          imageUrl: team?.logoUrl || null,
+          jerseyNumber: 0,
+          status: 'ACTIVE',
+          avgPoints: 0,
+        },
+      });
+      console.log(`   ✅ ${defensePlayer.name} - $${defensePlayer.price}`);
+      createdCount++; // Count as created for summary
+    } catch (error: any) {
+      console.log(`   ❌ Error creating defense: ${error.message}`);
+      errors.push(`Defense creation failed: ${error.message}`);
     }
 
     console.log(`\n📈 ${teamName} Summary:`);

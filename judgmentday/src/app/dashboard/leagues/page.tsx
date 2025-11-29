@@ -732,7 +732,9 @@ export default function LeaguesPage() {
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-300 mb-2">Match *</label>
+                <label className="block text-sm font-medium text-gray-300 mb-2">
+                  Match * <span className="text-xs text-gray-500">(Upcoming games from ESPN)</span>
+                </label>
                 <select
                   required
                   value={createForm.matchId}
@@ -740,12 +742,30 @@ export default function LeaguesPage() {
                   className="w-full px-4 py-2 bg-slate-700 border border-white/10 rounded-lg text-white focus:outline-none focus:border-blue-500"
                 >
                   <option value="">Select a match</option>
-                  {matches.map((match) => (
-                    <option key={match.id} value={match.id}>
-                      Week {match.week} - {match.homeTeam.abbreviation} vs {match.awayTeam.abbreviation} ({new Date(match.scheduledAt).toLocaleDateString()})
-                    </option>
-                  ))}
+                  {matches.length === 0 ? (
+                    <option value="" disabled>No upcoming matches available</option>
+                  ) : (
+                    matches.map((match) => {
+                      const matchDate = new Date(match.scheduledAt);
+                      const dateStr = matchDate.toLocaleDateString('en-US', { 
+                        month: 'short', 
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      });
+                      return (
+                        <option key={match.id} value={match.id}>
+                          Week {match.week}, {match.season} • {match.awayTeam.abbreviation} @ {match.homeTeam.abbreviation} • {dateStr}
+                        </option>
+                      );
+                    })
+                  )}
                 </select>
+                {matches.length === 0 && (
+                  <p className="text-xs text-yellow-400 mt-2">
+                    ⚠️ No upcoming matches found. Run: npx tsx scripts/populate-matches.ts
+                  </p>
+                )}
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
