@@ -78,6 +78,7 @@ export default function AdminPage() {
     basePrizePool: 0,
     prizeDistribution: [] as Array<{ rank: number; amount: number }>,
   });
+  const [syncingMatches, setSyncingMatches] = useState(false);
 
   const fetchAdminStats = useCallback(async () => {
     setStatsLoading(true);
@@ -127,6 +128,40 @@ export default function AdminPage() {
       console.error('Error fetching matches:', error);
     }
   }, []);
+
+  const syncMatches = async () => {
+    setSyncingMatches(true);
+    const loadingToast = toast.loading('Syncing matches from ESPN...');
+    try {
+      const response = await fetch('/api/admin/sync-matches', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          season: new Date().getFullYear(),
+          mode: 'all',
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Failed to sync matches');
+      }
+
+      toast.success(
+        `✅ Synced ${data.summary.total} matches! (${data.summary.created} new, ${data.summary.updated} updated)`,
+        { id: loadingToast, duration: 5000 }
+      );
+
+      // Refresh stats and matches
+      fetchAdminStats();
+      fetchMatches();
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to sync matches', { id: loadingToast });
+    } finally {
+      setSyncingMatches(false);
+    }
+  };
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -423,6 +458,27 @@ export default function AdminPage() {
             </div>
             <p className="text-3xl font-bold text-white mb-1">{stats.activeTeams}</p>
             <p className="text-sm text-gray-400">Fantasy Teams</p>
+          </div>
+        </div>
+
+        {/* Admin Actions Section */}
+        <div className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/20 rounded-2xl p-6 mb-12">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-lg font-bold text-white mb-1 flex items-center space-x-2">
+                <Database className="h-5 w-5 text-blue-400" />
+                <span>Data Management</span>
+              </h3>
+              <p className="text-sm text-gray-400">Sync latest matches and scores from ESPN API</p>
+            </div>
+            <button
+              onClick={syncMatches}
+              disabled={syncingMatches}
+              className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold rounded-lg hover:from-blue-600 hover:to-purple-600 transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none shadow-lg"
+            >
+              <RefreshCw className={`h-5 w-5 ${syncingMatches ? 'animate-spin' : ''}`} />
+              <span>{syncingMatches ? 'Syncing...' : 'Sync Matches from ESPN'}</span>
+            </button>
           </div>
         </div>
 
