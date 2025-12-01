@@ -151,11 +151,11 @@ export default function DashboardPage() {
               <div className="p-3 bg-gradient-to-br from-yellow-500 to-amber-600 rounded-xl">
                 <TrendingUp className="h-6 w-6 text-white" />
               </div>
-              <span className="text-yellow-400 text-sm font-semibold">100</span>
+              {/* <span className="text-yellow-400 text-sm font-semibold">100</span> */}
             </div>
-            <p className="text-gray-300 text-sm mb-1">Wallet Balance</p>
+            <p className="text-gray-300 text-sm mb-1">Wallet</p>
             <p className="text-3xl font-bold text-white mb-1">75</p>
-            <p className="text-xs text-gray-400">Credits available</p>
+            <p className="text-xs text-gray-400"> Team building Credits</p>
           </div>
         </div>
 

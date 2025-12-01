@@ -3,7 +3,7 @@
 import { use, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Navbar from '@/components/layout/Navbar';
-import { DollarSign, Users, TrendingUp, AlertCircle, CheckCircle, Trophy } from 'lucide-react';
+import { DollarSign, Users, TrendingUp, AlertCircle, CheckCircle, Trophy, User } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 interface Player {
@@ -13,6 +13,7 @@ interface Player {
   price: number;
   avgPoints: number;
   jerseyNumber: number;
+  imageUrl?: string | null;
   team: {
     name: string;
     abbreviation: string;
@@ -316,10 +317,16 @@ export default function TeamBuilderPage({ params }: { params: Promise<{ matchId:
                     >
                       <div className="flex justify-between items-center">
                         <div className="flex items-center space-x-4">
-                          <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                            <span className="text-white font-bold text-sm">
-                              #{player.jerseyNumber}
-                            </span>
+                          <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center flex-shrink-0 overflow-hidden">
+                            {player.imageUrl ? (
+                              <img
+                                src={player.imageUrl}
+                                alt={player.name}
+                                className="w-full h-full object-cover rounded-lg"
+                              />
+                            ) : (
+                              <User className="h-6 w-6 text-white" />
+                            )}
                           </div>
                           <div>
                             <p className="text-white font-semibold">{player.name}</p>
