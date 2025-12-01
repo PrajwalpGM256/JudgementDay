@@ -100,66 +100,65 @@ export default function DashboardPage() {
       <Navbar />
 
       {/* Main Content */}
-      <div className="container mx-auto px-6 py-8">
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-white mb-2">
+      <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8">
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-2">
             Welcome back, {session?.user?.name}!
           </h1>
-          <p className="text-gray-300">Here's your fantasy football overview.</p>
+          <p className="text-gray-300 text-sm sm:text-base">Here's your fantasy football overview.</p>
         </div>
 
         {/* Stats Grid */}
-        <div className="grid md:grid-cols-4 gap-6 mb-8">
-          <div className="group bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 hover:bg-white/10 hover:border-white/20 transition-all duration-300">
-            <div className="flex items-center justify-between mb-4">
-              <div className="p-3 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-xl">
-                <Award className="h-6 w-6 text-white" />
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
+          <div className="group bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-4 sm:p-6 hover:bg-white/10 hover:border-white/20 transition-all duration-300">
+            <div className="flex items-center justify-between mb-3 sm:mb-4">
+              <div className="p-2 sm:p-3 bg-gradient-to-br from-blue-500 to-cyan-600 rounded-xl">
+                <Award className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
               </div>
-              <TrendingUp className="h-5 w-5 text-green-400" />
+              <TrendingUp className="h-4 w-4 sm:h-5 sm:w-5 text-green-400" />
             </div>
-            <p className="text-gray-300 text-sm mb-1">Total Points</p>
-            <p className="text-3xl font-bold text-white mb-1">{stats.totalPoints}</p>
+            <p className="text-gray-300 text-xs sm:text-sm mb-1">Total Points</p>
+            <p className="text-2xl sm:text-3xl font-bold text-white mb-1">{stats.totalPoints}</p>
             <p className="text-xs text-gray-400">Across all teams</p>
           </div>
 
-          <div className="group bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 hover:bg-white/10 hover:border-white/20 transition-all duration-300">
-            <div className="flex items-center justify-between mb-4">
-              <div className="p-3 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl">
-                <Calendar className="h-6 w-6 text-white" />
+          <div className="group bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-4 sm:p-6 hover:bg-white/10 hover:border-white/20 transition-all duration-300">
+            <div className="flex items-center justify-between mb-3 sm:mb-4">
+              <div className="p-2 sm:p-3 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl">
+                <Calendar className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
               </div>
-              <span className="text-green-400 text-sm font-semibold">Active</span>
+              <span className="text-green-400 text-xs sm:text-sm font-semibold">Active</span>
             </div>
-            <p className="text-gray-300 text-sm mb-1">Teams Created</p>
-            <p className="text-3xl font-bold text-white mb-1">{stats.teamsCreated}</p>
+            <p className="text-gray-300 text-xs sm:text-sm mb-1">Teams Created</p>
+            <p className="text-2xl sm:text-3xl font-bold text-white mb-1">{stats.teamsCreated}</p>
             <p className="text-xs text-gray-400">Fantasy lineups</p>
           </div>
 
-          <div className="group bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 hover:bg-white/10 hover:border-white/20 transition-all duration-300">
-            <div className="flex items-center justify-between mb-4">
-              <div className="p-3 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl">
-                <Trophy className="h-6 w-6 text-white" />
+          <div className="group bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-4 sm:p-6 hover:bg-white/10 hover:border-white/20 transition-all duration-300">
+            <div className="flex items-center justify-between mb-3 sm:mb-4">
+              <div className="p-2 sm:p-3 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl">
+                <Trophy className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
               </div>
-              <span className="text-purple-400 text-sm font-semibold">Member</span>
+              <span className="text-purple-400 text-xs sm:text-sm font-semibold">Member</span>
             </div>
-            <p className="text-gray-300 text-sm mb-1">Leagues Joined</p>
-            <p className="text-3xl font-bold text-white mb-1">{stats.leaguesJoined}</p>
+            <p className="text-gray-300 text-xs sm:text-sm mb-1">Leagues Joined</p>
+            <p className="text-2xl sm:text-3xl font-bold text-white mb-1">{stats.leaguesJoined}</p>
             <p className="text-xs text-gray-400">Competitions</p>
           </div>
 
-          <div className="group bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 hover:bg-white/10 hover:border-white/20 transition-all duration-300">
-            <div className="flex items-center justify-between mb-4">
-              <div className="p-3 bg-gradient-to-br from-yellow-500 to-amber-600 rounded-xl">
-                <TrendingUp className="h-6 w-6 text-white" />
+          <div className="group bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-4 sm:p-6 hover:bg-white/10 hover:border-white/20 transition-all duration-300">
+            <div className="flex items-center justify-between mb-3 sm:mb-4">
+              <div className="p-2 sm:p-3 bg-gradient-to-br from-yellow-500 to-amber-600 rounded-xl">
+                <TrendingUp className="h-5 w-5 sm:h-6 sm:w-6 text-white" />
               </div>
-              {/* <span className="text-yellow-400 text-sm font-semibold">100</span> */}
             </div>
-            <p className="text-gray-300 text-sm mb-1">Wallet</p>
-            <p className="text-3xl font-bold text-white mb-1">75</p>
-            <p className="text-xs text-gray-400"> Team building Credits</p>
+            <p className="text-gray-300 text-xs sm:text-sm mb-1">Wallet</p>
+            <p className="text-2xl sm:text-3xl font-bold text-white mb-1">75</p>
+            <p className="text-xs text-gray-400">Team building Credits</p>
           </div>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
           {/* My Leagues */}
           <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl overflow-hidden">
             <div className="p-6 border-b border-white/10">
@@ -273,32 +272,32 @@ export default function DashboardPage() {
         </div>
 
         {/* Quick Actions */}
-        <div className="mt-8 grid md:grid-cols-3 gap-6">
+        <div className="mt-6 sm:mt-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
           <Link
             href="/dashboard/matches"
-            className="group p-6 bg-white/5 border border-white/10 rounded-2xl hover:bg-white/10 hover:border-white/20 transition-all duration-300"
+            className="group p-5 sm:p-6 bg-white/5 border border-white/10 rounded-2xl hover:bg-white/10 hover:border-white/20 transition-all duration-300"
           >
-            <Calendar className="h-8 w-8 text-amber-400 mb-4" />
-            <h3 className="text-lg font-bold text-white mb-2">Browse Matches</h3>
-            <p className="text-gray-400 text-sm">Find upcoming NFL games to build teams for</p>
+            <Calendar className="h-7 w-7 sm:h-8 sm:w-8 text-amber-400 mb-3 sm:mb-4" />
+            <h3 className="text-base sm:text-lg font-bold text-white mb-2">Browse Matches</h3>
+            <p className="text-gray-400 text-xs sm:text-sm">Find upcoming NFL games to build teams for</p>
           </Link>
 
           <Link
             href="/dashboard/leaderboard"
-            className="group p-6 bg-white/5 border border-white/10 rounded-2xl hover:bg-white/10 hover:border-white/20 transition-all duration-300"
+            className="group p-5 sm:p-6 bg-white/5 border border-white/10 rounded-2xl hover:bg-white/10 hover:border-white/20 transition-all duration-300"
           >
-            <Trophy className="h-8 w-8 text-amber-400 mb-4" />
-            <h3 className="text-lg font-bold text-white mb-2">View Leaderboard</h3>
-            <p className="text-gray-400 text-sm">Check your ranking and compete with others</p>
+            <Trophy className="h-7 w-7 sm:h-8 sm:w-8 text-amber-400 mb-3 sm:mb-4" />
+            <h3 className="text-base sm:text-lg font-bold text-white mb-2">View Leaderboard</h3>
+            <p className="text-gray-400 text-xs sm:text-sm">Check your ranking and compete with others</p>
           </Link>
 
           <Link
             href="/dashboard/leagues"
-            className="group p-6 bg-white/5 border border-white/10 rounded-2xl hover:bg-white/10 hover:border-white/20 transition-all duration-300"
+            className="group p-5 sm:p-6 bg-white/5 border border-white/10 rounded-2xl hover:bg-white/10 hover:border-white/20 transition-all duration-300"
           >
-            <Users className="h-8 w-8 text-amber-400 mb-4" />
-            <h3 className="text-lg font-bold text-white mb-2">Join Leagues</h3>
-            <p className="text-gray-400 text-sm">Compete with friends in private leagues</p>
+            <Users className="h-7 w-7 sm:h-8 sm:w-8 text-amber-400 mb-3 sm:mb-4" />
+            <h3 className="text-base sm:text-lg font-bold text-white mb-2">Join Leagues</h3>
+            <p className="text-gray-400 text-xs sm:text-sm">Compete with friends in private leagues</p>
           </Link>
         </div>
       </div>

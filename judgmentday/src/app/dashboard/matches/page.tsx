@@ -113,19 +113,19 @@ export default function MatchesPage() {
       <Navbar />
       
       {/* Header */}
-      <div className="bg-black/20 backdrop-blur-md border-b border-white/10 py-6">
-        <div className="container mx-auto px-6">
-          <h1 className="text-4xl font-bold text-white mb-2">Upcoming Matches</h1>
-          <p className="text-gray-300">Build your fantasy team for each match</p>
+      <div className="bg-black/20 backdrop-blur-md border-b border-white/10 py-4 sm:py-6">
+        <div className="container mx-auto px-4 sm:px-6">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-2">Upcoming Matches</h1>
+          <p className="text-gray-300 text-sm sm:text-base">Build your fantasy team for each match</p>
         </div>
       </div>
 
-      <div className="container mx-auto px-6 py-8">
+      <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8">
         {/* Filter Tabs - Only show upcoming matches */}
-        <div className="flex space-x-4 mb-8">
+        <div className="flex flex-col sm:flex-row gap-3 sm:space-x-4 mb-6 sm:mb-8">
           <button
             onClick={() => setFilter('scheduled')}
-            className={`px-6 py-2 rounded-lg font-semibold transition-all duration-200 ${
+            className={`px-5 sm:px-6 py-2 sm:py-2.5 rounded-lg font-semibold transition-all duration-200 text-sm sm:text-base ${
               filter === 'scheduled'
                 ? 'bg-gradient-to-r from-amber-400 to-orange-500 text-slate-900'
                 : 'bg-white/5 text-gray-300 hover:bg-white/10'
@@ -135,7 +135,7 @@ export default function MatchesPage() {
           </button>
           <button
             onClick={() => setFilter('live')}
-            className={`px-6 py-2 rounded-lg font-semibold transition-all duration-200 ${
+            className={`px-5 sm:px-6 py-2 sm:py-2.5 rounded-lg font-semibold transition-all duration-200 text-sm sm:text-base ${
               filter === 'live'
                 ? 'bg-gradient-to-r from-amber-400 to-orange-500 text-slate-900'
                 : 'bg-white/5 text-gray-300 hover:bg-white/10'

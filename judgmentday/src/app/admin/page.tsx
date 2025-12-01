@@ -399,94 +399,94 @@ export default function AdminPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800">
       {/* Header */}
-      <div className="bg-black/20 backdrop-blur-md border-b border-white/10 py-6">
-        <div className="container mx-auto px-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <Shield className="h-10 w-10 text-amber-400" />
+      <div className="bg-black/20 backdrop-blur-md border-b border-white/10 py-4 sm:py-6">
+        <div className="container mx-auto px-4 sm:px-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="flex items-center space-x-2 sm:space-x-3">
+              <Shield className="h-7 w-7 sm:h-8 sm:w-8 md:h-10 md:w-10 text-amber-400" />
               <div>
-                <h1 className="text-4xl font-bold text-white">Admin Dashboard</h1>
-                <p className="text-gray-300">Manage matches, players, and scoring</p>
+                <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white">Admin Dashboard</h1>
+                <p className="text-gray-300 text-sm sm:text-base">Manage matches, players, and scoring</p>
               </div>
             </div>
             <Link
               href="/dashboard"
-              className="flex items-center space-x-2 px-6 py-3 bg-slate-700 text-white font-semibold rounded-lg hover:bg-slate-600 border border-white/20 hover:border-white/40 transition-all duration-200"
+              className="flex items-center justify-center space-x-2 px-4 sm:px-6 py-2 sm:py-3 bg-slate-700 text-white font-semibold rounded-lg hover:bg-slate-600 border border-white/20 hover:border-white/40 transition-all duration-200 text-sm sm:text-base"
             >
-              <ArrowLeft className="h-5 w-5" />
+              <ArrowLeft className="h-4 w-4 sm:h-5 sm:w-5" />
               <span>Back to Dashboard</span>
             </Link>
           </div>
         </div>
       </div>
 
-      <div className="container mx-auto px-6 py-8">
+      <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8">
         {/* Stats Grid */}
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-white">Dashboard Statistics</h2>
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4 sm:mb-6">
+          <h2 className="text-xl sm:text-2xl font-bold text-white">Dashboard Statistics</h2>
           <button
             onClick={fetchAdminStats}
             disabled={statsLoading}
-            className="flex items-center space-x-2 px-4 py-2 bg-amber-500/20 text-amber-400 rounded-lg hover:bg-amber-500/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center justify-center space-x-2 px-4 py-2 bg-amber-500/20 text-amber-400 rounded-lg hover:bg-amber-500/30 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
           >
             <RefreshCw className={`h-4 w-4 ${statsLoading ? 'animate-spin' : ''}`} />
             <span>Refresh</span>
           </button>
         </div>
-        <div className="grid md:grid-cols-4 gap-6 mb-12">
-          <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6">
-            <div className="flex items-center justify-between mb-4">
-              <Users className="h-8 w-8 text-blue-400" />
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 mb-8 sm:mb-12">
+          <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-4 sm:p-6">
+            <div className="flex items-center justify-between mb-3 sm:mb-4">
+              <Users className="h-6 w-6 sm:h-8 sm:w-8 text-blue-400" />
               <span className="text-xs text-gray-400">Total</span>
             </div>
-            <p className="text-3xl font-bold text-white mb-1">{stats.totalUsers}</p>
-            <p className="text-sm text-gray-400">Registered Users</p>
+            <p className="text-2xl sm:text-3xl font-bold text-white mb-1">{stats.totalUsers}</p>
+            <p className="text-xs sm:text-sm text-gray-400">Registered Users</p>
           </div>
 
-          <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6">
-            <div className="flex items-center justify-between mb-4">
-              <Calendar className="h-8 w-8 text-green-400" />
+          <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-4 sm:p-6">
+            <div className="flex items-center justify-between mb-3 sm:mb-4">
+              <Calendar className="h-6 w-6 sm:h-8 sm:w-8 text-green-400" />
               <span className="text-xs text-gray-400">Active</span>
             </div>
-            <p className="text-3xl font-bold text-white mb-1">{stats.totalMatches}</p>
-            <p className="text-sm text-gray-400">Scheduled Matches</p>
+            <p className="text-2xl sm:text-3xl font-bold text-white mb-1">{stats.totalMatches}</p>
+            <p className="text-xs sm:text-sm text-gray-400">Scheduled Matches</p>
           </div>
 
-          <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6">
-            <div className="flex items-center justify-between mb-4">
-              <Database className="h-8 w-8 text-purple-400" />
+          <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-4 sm:p-6">
+            <div className="flex items-center justify-between mb-3 sm:mb-4">
+              <Database className="h-6 w-6 sm:h-8 sm:w-8 text-purple-400" />
               <span className="text-xs text-gray-400">Available</span>
             </div>
-            <p className="text-3xl font-bold text-white mb-1">{stats.totalPlayers}</p>
-            <p className="text-sm text-gray-400">Players in Database</p>
+            <p className="text-2xl sm:text-3xl font-bold text-white mb-1">{stats.totalPlayers}</p>
+            <p className="text-xs sm:text-sm text-gray-400">Players in Database</p>
           </div>
 
-          <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6">
-            <div className="flex items-center justify-between mb-4">
-              <TrendingUp className="h-8 w-8 text-amber-400" />
+          <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-4 sm:p-6">
+            <div className="flex items-center justify-between mb-3 sm:mb-4">
+              <TrendingUp className="h-6 w-6 sm:h-8 sm:w-8 text-amber-400" />
               <span className="text-xs text-gray-400">Created</span>
             </div>
-            <p className="text-3xl font-bold text-white mb-1">{stats.activeTeams}</p>
-            <p className="text-sm text-gray-400">Fantasy Teams</p>
+            <p className="text-2xl sm:text-3xl font-bold text-white mb-1">{stats.activeTeams}</p>
+            <p className="text-xs sm:text-sm text-gray-400">Fantasy Teams</p>
           </div>
         </div>
 
         {/* Admin Actions Section */}
-        <div className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/20 rounded-2xl p-6 mb-12">
-          <div className="flex items-center justify-between">
+        <div className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 border border-blue-500/20 rounded-2xl p-4 sm:p-6 mb-8 sm:mb-12">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h3 className="text-lg font-bold text-white mb-1 flex items-center space-x-2">
-                <Database className="h-5 w-5 text-blue-400" />
+              <h3 className="text-base sm:text-lg font-bold text-white mb-1 flex items-center space-x-2">
+                <Database className="h-4 w-4 sm:h-5 sm:w-5 text-blue-400" />
                 <span>Data Management</span>
               </h3>
-              <p className="text-sm text-gray-400">Sync latest matches and scores from ESPN API</p>
+              <p className="text-xs sm:text-sm text-gray-400">Sync latest matches and scores from ESPN API</p>
             </div>
             <button
               onClick={syncMatches}
               disabled={syncingMatches}
-              className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold rounded-lg hover:from-blue-600 hover:to-purple-600 transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none shadow-lg"
+              className="flex items-center justify-center space-x-2 px-5 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold rounded-lg hover:from-blue-600 hover:to-purple-600 transform hover:scale-105 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none shadow-lg text-sm sm:text-base"
             >
-              <RefreshCw className={`h-5 w-5 ${syncingMatches ? 'animate-spin' : ''}`} />
+              <RefreshCw className={`h-4 w-4 sm:h-5 sm:w-5 ${syncingMatches ? 'animate-spin' : ''}`} />
               <span>{syncingMatches ? 'Syncing...' : 'Sync Matches from ESPN'}</span>
             </button>
           </div>
@@ -548,7 +548,7 @@ export default function AdminPage() {
                         {league.description && (
                           <p className="text-gray-300 mb-3">{league.description}</p>
                         )}
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 text-xs sm:text-sm">
                           <div>
                             <span className="text-gray-400">Members: </span>
                             <span className="text-white font-semibold">

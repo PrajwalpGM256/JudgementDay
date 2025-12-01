@@ -398,23 +398,23 @@ export default function LeaguesPage() {
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800">
       <Navbar />
 
-      <div className="container mx-auto px-6 py-8">
-        <div className="flex justify-between items-center mb-8">
+      <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8">
+        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6 sm:mb-8">
           <div>
-            <h1 className="text-4xl font-bold text-white mb-2">Leagues</h1>
-            <p className="text-gray-300">Join competitive leagues and prove your prediction skills</p>
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-2">Leagues</h1>
+            <p className="text-gray-300 text-sm sm:text-base">Join competitive leagues and prove your prediction skills</p>
           </div>
-          <div className="flex space-x-4">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
             <button
               onClick={() => setShowCreateModal(true)}
-              className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl hover:from-green-400 hover:to-emerald-500 font-semibold transform hover:scale-105 transition-all duration-200 shadow-lg"
+              className="flex items-center justify-center space-x-2 px-5 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-xl hover:from-green-400 hover:to-emerald-500 font-semibold transform hover:scale-105 transition-all duration-200 shadow-lg text-sm sm:text-base"
             >
               <Plus className="h-4 w-4" />
               <span>Create League</span>
             </button>
             <button
               onClick={() => setShowJoinModal(true)}
-              className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-cyan-600 text-white rounded-xl hover:from-blue-400 hover:to-cyan-500 font-semibold transform hover:scale-105 transition-all duration-200 shadow-lg"
+              className="flex items-center justify-center space-x-2 px-5 sm:px-6 py-2.5 sm:py-3 bg-gradient-to-r from-blue-500 to-cyan-600 text-white rounded-xl hover:from-blue-400 hover:to-cyan-500 font-semibold transform hover:scale-105 transition-all duration-200 shadow-lg text-sm sm:text-base"
             >
               <Users className="h-4 w-4" />
               <span>Enter Code</span>
@@ -435,7 +435,7 @@ export default function LeaguesPage() {
               <p className="text-gray-500 text-sm mt-2">Create a league or join an existing one to get started</p>
             </div>
           ) : (
-            <div className="grid md:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {myLeagues.map((league) => {
                 const topMembers = league.members.slice(0, 3);
                 const isMember = league.isMember || false;
@@ -617,8 +617,8 @@ export default function LeaguesPage() {
             </div>
           ) : (
             <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl overflow-hidden">
-              <div className="overflow-x-auto">
-                <table className="w-full">
+              <div className="overflow-x-auto -mx-4 sm:mx-0">
+                <table className="w-full min-w-[640px]">
                   <thead className="bg-white/5 border-b border-white/10">
                     <tr>
                       <th className="px-6 py-4 text-left text-xs font-semibold text-gray-300 uppercase tracking-wider">

@@ -55,30 +55,30 @@ export default function RegisterPage() {
       {/* Back to Home Link */}
       <Link
         href="/"
-        className="absolute top-6 left-6 flex items-center space-x-2 text-gray-300 hover:text-white transition-colors z-20"
+        className="absolute top-4 left-4 sm:top-6 sm:left-6 flex items-center space-x-2 text-gray-300 hover:text-white transition-colors z-20"
       >
         <ArrowRight className="h-4 w-4 rotate-180" />
-        <span>Back to Home</span>
+        <span className="text-sm sm:text-base">Back to Home</span>
       </Link>
 
-      <div className="relative z-10 w-full max-w-md mx-4">
+      <div className="relative z-10 w-full max-w-md mx-4 px-2 sm:px-0">
         {/* Logo */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center space-x-3 mb-6">
-            <div className="p-3 bg-gradient-to-br from-amber-400 to-orange-500 rounded-xl shadow-lg">
-              <Scale className="h-8 w-8 text-slate-900" />
+        <div className="text-center mb-6 sm:mb-8">
+          <div className="inline-flex items-center space-x-2 sm:space-x-3 mb-4 sm:mb-6">
+            <div className="p-2 sm:p-3 bg-gradient-to-br from-amber-400 to-orange-500 rounded-xl shadow-lg">
+              <Scale className="h-6 w-6 sm:h-8 sm:w-8 text-slate-900" />
             </div>
-            <span className="text-3xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
+            <span className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
               JudgmentDay
             </span>
           </div>
-          <h1 className="text-4xl font-bold text-white mb-2">Join the Game</h1>
-          <p className="text-gray-300">Create your account and start building fantasy teams</p>
+          <h1 className="text-3xl sm:text-4xl font-bold text-white mb-2">Join the Game</h1>
+          <p className="text-gray-300 text-sm sm:text-base">Create your account and start building fantasy teams</p>
         </div>
 
         {/* Registration Form */}
-        <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-8 shadow-2xl">
-          <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl p-6 sm:p-8 shadow-2xl">
+          <form onSubmit={handleSubmit} className="space-y-5 sm:space-y-6">
             <div>
               <label className="block text-sm font-semibold text-gray-200 mb-3">Username</label>
               <div className="relative">

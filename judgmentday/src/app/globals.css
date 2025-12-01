@@ -100,3 +100,88 @@ button, a, input, textarea, select {
   background-size: 400% 400%;
   animation: gradient-shift 15s ease infinite;
 }
+
+/* Mobile-friendly utilities */
+@media (max-width: 640px) {
+  /* Prevent horizontal scroll on mobile */
+  body {
+    overflow-x: hidden;
+  }
+
+  /* Better touch targets on mobile */
+  button,
+  a {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Prevent text from being too small */
+  * {
+    -webkit-text-size-adjust: 100%;
+  }
+}
+
+/* Better scrolling on iOS */
+* {
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Improve tap highlight on mobile */
+* {
+  -webkit-tap-highlight-color: rgba(245, 158, 11, 0.2);
+}
+
+/* Responsive container utilities */
+.container {
+  width: 100%;
+  margin-right: auto;
+  margin-left: auto;
+}
+
+@media (min-width: 640px) {
+  .container {
+    max-width: 640px;
+  }
+}
+
+@media (min-width: 768px) {
+  .container {
+    max-width: 768px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container {
+    max-width: 1024px;
+  }
+}
+
+@media (min-width: 1280px) {
+  .container {
+    max-width: 1280px;
+  }
+}
+
+@media (min-width: 1536px) {
+  .container {
+    max-width: 1536px;
+  }
+}
+
+/* Hide scrollbar for modal content on mobile while keeping functionality */
+.modal-content {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.modal-content::-webkit-scrollbar {
+  display: none;
+}
+
+/* Improved focus visibility on mobile */
+@media (max-width: 640px) {
+  *:focus-visible {
+    outline: 3px solid #f59e0b;
+    outline-offset: 3px;
+  }
+}

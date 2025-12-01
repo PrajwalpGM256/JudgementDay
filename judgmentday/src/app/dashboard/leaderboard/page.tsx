@@ -68,24 +68,24 @@ export default function LeaderboardPage() {
       <Navbar />
       
       {/* Header */}
-      <div className="bg-black/20 backdrop-blur-md border-b border-white/10 py-6">
-        <div className="container mx-auto px-6">
-          <div className="flex items-center justify-between">
+      <div className="bg-black/20 backdrop-blur-md border-b border-white/10 py-4 sm:py-6">
+        <div className="container mx-auto px-4 sm:px-6">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="text-4xl font-bold text-white mb-2 flex items-center space-x-3">
-                <Trophy className="h-10 w-10 text-amber-400" />
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white mb-2 flex items-center space-x-2 sm:space-x-3">
+                <Trophy className="h-7 w-7 sm:h-8 sm:w-8 md:h-10 md:w-10 text-amber-400" />
                 <span>Leaderboard</span>
               </h1>
-              <p className="text-gray-300">See how you rank against other players</p>
+              <p className="text-gray-300 text-sm sm:text-base">See how you rank against other players</p>
             </div>
-            <div className="flex items-center space-x-4 text-gray-300">
+            <div className="flex items-center space-x-3 sm:space-x-4 text-gray-300">
               <div className="flex items-center space-x-2">
-                <Users className="h-5 w-5 text-amber-400" />
-                <span className="font-semibold">{leaderboard.length} Players</span>
+                <Users className="h-4 w-4 sm:h-5 sm:w-5 text-amber-400" />
+                <span className="font-semibold text-sm sm:text-base">{leaderboard.length} Players</span>
               </div>
               <button
                 onClick={fetchLeaderboard}
-                className="px-4 py-2 bg-white/5 hover:bg-white/10 rounded-lg transition-colors"
+                className="px-3 sm:px-4 py-1.5 sm:py-2 bg-white/5 hover:bg-white/10 rounded-lg transition-colors text-sm sm:text-base"
               >
                 Refresh
               </button>
@@ -94,20 +94,20 @@ export default function LeaderboardPage() {
         </div>
       </div>
 
-      <div className="container mx-auto px-6 py-8">
+      <div className="container mx-auto px-4 sm:px-6 py-6 sm:py-8">
         {/* Top 3 Podium */}
         {leaderboard.length >= 3 && (
-          <div className="grid grid-cols-3 gap-6 mb-12 max-w-4xl mx-auto">
+          <div className="grid grid-cols-3 gap-3 sm:gap-6 mb-8 sm:mb-12 max-w-4xl mx-auto">
             {/* 2nd Place */}
-            <div className="flex flex-col items-center pt-12">
-              <div className="w-24 h-24 bg-gradient-to-br from-gray-300 to-gray-400 rounded-full flex items-center justify-center mb-4 shadow-2xl">
-                <Medal className="h-12 w-12 text-slate-900" />
+            <div className="flex flex-col items-center pt-6 sm:pt-12">
+              <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 bg-gradient-to-br from-gray-300 to-gray-400 rounded-full flex items-center justify-center mb-2 sm:mb-4 shadow-2xl">
+                <Medal className="h-8 w-8 sm:h-10 sm:w-10 md:h-12 md:w-12 text-slate-900" />
               </div>
               <div className="text-center">
-                <p className="text-2xl font-bold text-white mb-1">{leaderboard[1].username}</p>
-                <p className="text-amber-400 font-bold text-xl">{leaderboard[1].points} pts</p>
-                <div className="mt-4 px-6 py-3 bg-gradient-to-r from-gray-300 to-gray-400 rounded-xl">
-                  <p className="text-slate-900 font-bold text-lg">2nd Place</p>
+                <p className="text-sm sm:text-lg md:text-2xl font-bold text-white mb-1 truncate max-w-[100px] sm:max-w-none">{leaderboard[1].username}</p>
+                <p className="text-amber-400 font-bold text-sm sm:text-base md:text-xl">{leaderboard[1].points} pts</p>
+                <div className="mt-2 sm:mt-4 px-3 py-2 sm:px-6 sm:py-3 bg-gradient-to-r from-gray-300 to-gray-400 rounded-xl">
+                  <p className="text-slate-900 font-bold text-xs sm:text-sm md:text-lg">2nd Place</p>
                 </div>
               </div>
             </div>
@@ -115,30 +115,30 @@ export default function LeaderboardPage() {
             {/* 1st Place */}
             <div className="flex flex-col items-center">
               <div className="relative">
-                <div className="absolute -inset-2 bg-gradient-to-r from-yellow-400 to-amber-500 rounded-full blur-xl opacity-50 animate-pulse"></div>
-                <div className="relative w-32 h-32 bg-gradient-to-br from-yellow-400 to-amber-500 rounded-full flex items-center justify-center shadow-2xl">
-                  <Trophy className="h-16 w-16 text-slate-900" />
+                <div className="absolute -inset-1 sm:-inset-2 bg-gradient-to-r from-yellow-400 to-amber-500 rounded-full blur-xl opacity-50 animate-pulse"></div>
+                <div className="relative w-20 h-20 sm:w-24 sm:h-24 md:w-32 md:h-32 bg-gradient-to-br from-yellow-400 to-amber-500 rounded-full flex items-center justify-center shadow-2xl">
+                  <Trophy className="h-10 w-10 sm:h-12 sm:w-12 md:h-16 md:w-16 text-slate-900" />
                 </div>
               </div>
-              <div className="text-center mt-4">
-                <p className="text-3xl font-bold text-white mb-1">{leaderboard[0].username}</p>
-                <p className="text-amber-400 font-bold text-2xl">{leaderboard[0].points} pts</p>
-                <div className="mt-4 px-8 py-4 bg-gradient-to-r from-yellow-400 to-amber-500 rounded-xl shadow-2xl">
-                  <p className="text-slate-900 font-bold text-xl">🏆 Champion</p>
+              <div className="text-center mt-2 sm:mt-4">
+                <p className="text-base sm:text-2xl md:text-3xl font-bold text-white mb-1 truncate max-w-[120px] sm:max-w-none">{leaderboard[0].username}</p>
+                <p className="text-amber-400 font-bold text-base sm:text-xl md:text-2xl">{leaderboard[0].points} pts</p>
+                <div className="mt-2 sm:mt-4 px-4 py-2 sm:px-8 sm:py-4 bg-gradient-to-r from-yellow-400 to-amber-500 rounded-xl shadow-2xl">
+                  <p className="text-slate-900 font-bold text-sm sm:text-base md:text-xl">🏆 Champion</p>
                 </div>
               </div>
             </div>
 
             {/* 3rd Place */}
-            <div className="flex flex-col items-center pt-12">
-              <div className="w-24 h-24 bg-gradient-to-br from-amber-600 to-amber-700 rounded-full flex items-center justify-center mb-4 shadow-2xl">
-                <Medal className="h-12 w-12 text-white" />
+            <div className="flex flex-col items-center pt-6 sm:pt-12">
+              <div className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 bg-gradient-to-br from-amber-600 to-amber-700 rounded-full flex items-center justify-center mb-2 sm:mb-4 shadow-2xl">
+                <Medal className="h-8 w-8 sm:h-10 sm:w-10 md:h-12 md:w-12 text-white" />
               </div>
               <div className="text-center">
-                <p className="text-2xl font-bold text-white mb-1">{leaderboard[2].username}</p>
-                <p className="text-amber-400 font-bold text-xl">{leaderboard[2].points} pts</p>
-                <div className="mt-4 px-6 py-3 bg-gradient-to-r from-amber-600 to-amber-700 rounded-xl">
-                  <p className="text-white font-bold text-lg">3rd Place</p>
+                <p className="text-sm sm:text-lg md:text-2xl font-bold text-white mb-1 truncate max-w-[100px] sm:max-w-none">{leaderboard[2].username}</p>
+                <p className="text-amber-400 font-bold text-sm sm:text-base md:text-xl">{leaderboard[2].points} pts</p>
+                <div className="mt-2 sm:mt-4 px-3 py-2 sm:px-6 sm:py-3 bg-gradient-to-r from-amber-600 to-amber-700 rounded-xl">
+                  <p className="text-white font-bold text-xs sm:text-sm md:text-lg">3rd Place</p>
                 </div>
               </div>
             </div>
