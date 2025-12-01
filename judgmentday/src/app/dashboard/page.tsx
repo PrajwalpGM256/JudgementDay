@@ -236,22 +236,28 @@ export default function DashboardPage() {
                 <>
                   <div className="space-y-3">
                     {userTeams.slice(0, 3).map((team) => (
-                      <div
+                      <Link
                         key={team.id}
-                        className="p-4 bg-white/5 border border-white/10 rounded-xl"
+                        href={`/dashboard/team-results/${team.id}`}
+                        className="group block p-4 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 hover:border-amber-400/50 hover:shadow-lg hover:shadow-amber-400/20 transition-all duration-200 cursor-pointer"
                       >
                         <div className="flex justify-between items-center mb-2">
-                          <span className="text-white font-medium">
+                          <span className="text-white font-medium group-hover:text-amber-400 transition-colors">
                             Week {team.match.week} • {team.match.status}
                           </span>
-                          <span className="text-amber-400 font-bold">
+                          <span className="text-amber-400 font-bold group-hover:scale-110 transition-transform">
                             {team.totalPoints.toFixed(1)} pts
                           </span>
                         </div>
-                        <p className="text-sm text-gray-400">
-                          {team.match.homeTeam.abbreviation} vs {team.match.awayTeam.abbreviation}
-                        </p>
-                      </div>
+                        <div className="flex justify-between items-center">
+                          <p className="text-sm text-gray-400 group-hover:text-gray-300 transition-colors">
+                            {team.match.homeTeam.abbreviation} vs {team.match.awayTeam.abbreviation}
+                          </p>
+                          <span className="text-amber-400 text-xs group-hover:translate-x-1 transition-transform">
+                            View Results →
+                          </span>
+                        </div>
+                      </Link>
                     ))}
                   </div>
                   <Link
