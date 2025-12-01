@@ -73,9 +73,23 @@ export async function GET(
       })
     );
 
+    // Calculate total fantasy points from all players
+    const calculatedTotalPoints = enrichedPlayers.reduce((total, player) => {
+      return total + (player.stats?.fantasyPoints || 0);
+    }, 0);
+
+    // Update the totalPoints in database if it's different
+    if (userTeam.totalPoints !== calculatedTotalPoints) {
+      await prisma.userTeam.update({
+        where: { id: userTeam.id },
+        data: { totalPoints: calculatedTotalPoints },
+      });
+    }
+
     return NextResponse.json({
       userTeam: {
         ...userTeam,
+        totalPoints: calculatedTotalPoints, // ✅ Return calculated total
         players: enrichedPlayers,
       },
     });
