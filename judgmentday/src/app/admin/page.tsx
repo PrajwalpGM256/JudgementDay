@@ -3,7 +3,8 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import { Shield, Calendar, Users, TrendingUp, Database, RefreshCw, Trophy, Plus, X, Globe, Lock, Edit, Trash2, Trash2 as Trash } from 'lucide-react';
+import Link from 'next/link';
+import { Shield, Calendar, Users, TrendingUp, Database, RefreshCw, Trophy, Plus, X, Globe, Lock, Edit, Trash2, Trash2 as Trash, ArrowLeft } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 interface League {
@@ -400,12 +401,21 @@ export default function AdminPage() {
       {/* Header */}
       <div className="bg-black/20 backdrop-blur-md border-b border-white/10 py-6">
         <div className="container mx-auto px-6">
-          <div className="flex items-center space-x-3">
-            <Shield className="h-10 w-10 text-amber-400" />
-            <div>
-              <h1 className="text-4xl font-bold text-white">Admin Dashboard</h1>
-              <p className="text-gray-300">Manage matches, players, and scoring</p>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-3">
+              <Shield className="h-10 w-10 text-amber-400" />
+              <div>
+                <h1 className="text-4xl font-bold text-white">Admin Dashboard</h1>
+                <p className="text-gray-300">Manage matches, players, and scoring</p>
+              </div>
             </div>
+            <Link
+              href="/dashboard"
+              className="flex items-center space-x-2 px-6 py-3 bg-slate-700 text-white font-semibold rounded-lg hover:bg-slate-600 border border-white/20 hover:border-white/40 transition-all duration-200"
+            >
+              <ArrowLeft className="h-5 w-5" />
+              <span>Back to Dashboard</span>
+            </Link>
           </div>
         </div>
       </div>
