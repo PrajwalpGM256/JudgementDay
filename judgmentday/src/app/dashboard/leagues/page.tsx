@@ -5,7 +5,7 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Navbar from '@/components/layout/Navbar';
-import { Plus, Users, Crown, Star, ArrowRight, Trophy, X, Copy, Check, Trash2, Coins } from 'lucide-react';
+import { Plus, Users, Crown, Star, ArrowRight, Trophy, X, Copy, Check, Trash2, Coins, RefreshCw } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 interface LeagueMember {
@@ -72,6 +72,9 @@ export default function LeaguesPage() {
   const [userTeams, setUserTeams] = useState<any[]>([]);
   const [selectedTeamId, setSelectedTeamId] = useState('');
   const [loadingTeams, setLoadingTeams] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [leagueToDelete, setLeagueToDelete] = useState<League | null>(null);
+  const [deleting, setDeleting] = useState(false);
 
   const [matches, setMatches] = useState<any[]>([]);
   const [userCredits, setUserCredits] = useState(0);
@@ -322,6 +325,31 @@ export default function LeaguesPage() {
     }
   };
 
+  const handleDeleteLeague = async () => {
+    if (!leagueToDelete) return;
+
+    setDeleting(true);
+    try {
+      const response = await fetch(`/api/leagues?id=${leagueToDelete.id}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || 'Failed to delete league');
+      }
+
+      toast.success(`League "${leagueToDelete.name}" deleted successfully`);
+      setShowDeleteConfirm(false);
+      setLeagueToDelete(null);
+      fetchLeagues();
+    } catch (error: any) {
+      toast.error(error.message || 'Failed to delete league');
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   const copyInviteCode = (code: string) => {
     navigator.clipboard.writeText(code);
     setCopiedCode(true);
@@ -528,13 +556,29 @@ export default function LeaguesPage() {
                         </div>
                       )}
 
-                      <Link
-                        href={`/dashboard/leagues/${league.id}`}
-                        className="group/link block w-full py-3 bg-gradient-to-r from-blue-500 to-cyan-600 text-white text-center rounded-xl hover:from-blue-400 hover:to-cyan-500 font-semibold transform hover:scale-105 transition-all duration-200 shadow-lg flex items-center justify-center space-x-2"
-                      >
-                        <span>View League</span>
-                        <ArrowRight className="h-4 w-4 group-hover/link:translate-x-1 transition-transform" />
-                      </Link>
+                      <div className="space-y-2">
+                        <Link
+                          href={`/dashboard/leagues/${league.id}`}
+                          className="group/link block w-full py-3 bg-gradient-to-r from-blue-500 to-cyan-600 text-white text-center rounded-xl hover:from-blue-400 hover:to-cyan-500 font-semibold transform hover:scale-105 transition-all duration-200 shadow-lg flex items-center justify-center space-x-2"
+                        >
+                          <span>View League</span>
+                          <ArrowRight className="h-4 w-4 group-hover/link:translate-x-1 transition-transform" />
+                        </Link>
+                        
+                        {/* Delete Button - Only show for commissioner */}
+                        {isCommissioner && (
+                          <button
+                            onClick={() => {
+                              setLeagueToDelete(league);
+                              setShowDeleteConfirm(true);
+                            }}
+                            className="w-full py-2 bg-red-500/20 text-red-400 text-center rounded-xl hover:bg-red-500/30 font-medium border border-red-500/30 hover:border-red-500/50 transition-all duration-200 flex items-center justify-center space-x-2"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                            <span>Delete League</span>
+                          </button>
+                        )}
+                      </div>
                     </div>
                   </div>
                 );
@@ -1165,6 +1209,77 @@ export default function LeaguesPage() {
                   View Full Details
                 </Link>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteConfirm && leagueToDelete && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-6">
+          <div className="bg-slate-800 border border-red-500/30 rounded-2xl max-w-md w-full shadow-2xl">
+            <div className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center space-x-3">
+                  <div className="p-3 bg-red-500/20 rounded-full">
+                    <Trash2 className="h-6 w-6 text-red-400" />
+                  </div>
+                  <h2 className="text-2xl font-bold text-white">Delete League?</h2>
+                </div>
+                <button
+                  onClick={() => {
+                    setShowDeleteConfirm(false);
+                    setLeagueToDelete(null);
+                  }}
+                  className="text-gray-400 hover:text-white"
+                >
+                  <X className="h-6 w-6" />
+                </button>
+              </div>
+
+              <div className="mb-6">
+                <p className="text-gray-300 mb-4">
+                  Are you sure you want to delete the league <span className="font-bold text-white">"{leagueToDelete.name}"</span>?
+                </p>
+                <div className="bg-red-500/10 border border-red-500/30 rounded-lg p-4">
+                  <p className="text-red-300 text-sm font-semibold mb-2">⚠️ This action cannot be undone!</p>
+                  <ul className="text-red-200 text-sm space-y-1">
+                    <li>• All league data will be permanently deleted</li>
+                    <li>• Members will be removed from the league</li>
+                    <li>• League standings will be lost</li>
+                  </ul>
+                </div>
+              </div>
+
+              <div className="flex space-x-4">
+                <button
+                  onClick={() => {
+                    setShowDeleteConfirm(false);
+                    setLeagueToDelete(null);
+                  }}
+                  disabled={deleting}
+                  className="flex-1 px-4 py-3 bg-gray-600 text-white rounded-lg hover:bg-gray-500 font-semibold disabled:opacity-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleDeleteLeague}
+                  disabled={deleting}
+                  className="flex-1 px-4 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 font-semibold disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center space-x-2"
+                >
+                  {deleting ? (
+                    <>
+                      <RefreshCw className="h-4 w-4 animate-spin" />
+                      <span>Deleting...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Trash2 className="h-4 w-4" />
+                      <span>Delete League</span>
+                    </>
+                  )}
+                </button>
+              </div>
             </div>
           </div>
         </div>

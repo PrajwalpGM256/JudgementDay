@@ -574,3 +574,77 @@ export async function PUT(request: NextRequest) {
   }
 }
 
+// DELETE /api/leagues - Delete a league (Commissioner only)
+export async function DELETE(request: NextRequest) {
+  try {
+    const session = await getServerSession(authOptions);
+    if (!session) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const { searchParams } = new URL(request.url);
+    const leagueId = searchParams.get('id');
+
+    if (!leagueId) {
+      return NextResponse.json(
+        { error: 'League ID is required' },
+        { status: 400 }
+      );
+    }
+
+    // Check if the league exists and user is the commissioner
+    const league = await prisma.league.findUnique({
+      where: { id: leagueId },
+      select: {
+        id: true,
+        name: true,
+        commissionerId: true,
+        _count: {
+          select: {
+            members: true,
+          },
+        },
+      },
+    });
+
+    if (!league) {
+      return NextResponse.json(
+        { error: 'League not found' },
+        { status: 404 }
+      );
+    }
+
+    // Verify user is the commissioner
+    if (league.commissionerId !== session.user.id) {
+      return NextResponse.json(
+        { error: 'Only the league commissioner can delete this league' },
+        { status: 403 }
+      );
+    }
+
+    // Check if league has members (optional - you might want to prevent deletion if there are members)
+    if (league._count.members > 1) {
+      return NextResponse.json(
+        { error: 'Cannot delete league with members. Please remove all members first.' },
+        { status: 400 }
+      );
+    }
+
+    // Delete the league (cascade will handle members)
+    await prisma.league.delete({
+      where: { id: leagueId },
+    });
+
+    return NextResponse.json({
+      success: true,
+      message: `League "${league.name}" deleted successfully`,
+    });
+  } catch (error) {
+    console.error('Error deleting league:', error);
+    return NextResponse.json(
+      { error: 'Failed to delete league' },
+      { status: 500 }
+    );
+  }
+}
+
