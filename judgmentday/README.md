@@ -396,3 +396,5 @@ Demo accounts are available after seeding:
 ## 🎨 Design & Wireframes
 
 - **Figma Design**: [View Wireframes](https://www.figma.com/design/qwO4AwCitaWPWiEMeJCT2G/JudgementDay?node-id=0-1&t=ubbroK396GKiGLhV-1)
+
+- **Vercel Deployment**: [JudgementDay](https://judgmentday.vercel.app/)
