@@ -12,6 +12,7 @@ import {
   Users,
   Target,
   Trophy,
+  Trash2,
 } from 'lucide-react';
 
 interface League {
@@ -45,6 +46,7 @@ export default function DashboardPage() {
     leaguesJoined: 0,
   });
   const [loading, setLoading] = useState(true);
+  const [deletingTeamId, setDeletingTeamId] = useState<string | null>(null);
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -84,6 +86,48 @@ export default function DashboardPage() {
       console.error('Error fetching dashboard data:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleDeleteTeam = async (teamId: string, e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (!confirm('Are you sure you want to delete this team? This action cannot be undone.')) {
+      return;
+    }
+
+    try {
+      setDeletingTeamId(teamId);
+      const response = await fetch(`/api/user-teams/${teamId}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Failed to delete team');
+      }
+
+      // Remove the team from the list
+      setUserTeams(userTeams.filter(team => team.id !== teamId));
+      
+      // Recalculate stats
+      const updatedTeams = userTeams.filter(team => team.id !== teamId);
+      const totalPoints = updatedTeams.reduce(
+        (sum: number, team: UserTeam) => sum + team.totalPoints,
+        0
+      );
+
+      setStats({
+        ...stats,
+        totalPoints: Math.round(totalPoints),
+        teamsCreated: updatedTeams.length,
+      });
+    } catch (error: any) {
+      console.error('Error deleting team:', error);
+      alert(error.message || 'Failed to delete team. Please try again.');
+    } finally {
+      setDeletingTeamId(null);
     }
   };
 
@@ -212,14 +256,14 @@ export default function DashboardPage() {
           </div>
 
           {/* My Teams */}
-          <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl overflow-hidden">
-            <div className="p-6 border-b border-white/10">
+          <div className="bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl overflow-hidden flex flex-col">
+            <div className="p-6 border-b border-white/10 flex-shrink-0">
               <div className="flex items-center space-x-3">
                 <Target className="h-6 w-6 text-amber-400" />
                 <h2 className="text-xl font-bold text-white">My Teams</h2>
               </div>
             </div>
-            <div className="p-6">
+            <div className="p-6 flex-1 flex flex-col min-h-0">
               {userTeams.length === 0 ? (
                 <div className="text-center py-8">
                   <Calendar className="h-12 w-12 text-gray-500 mx-auto mb-3" />
@@ -233,35 +277,51 @@ export default function DashboardPage() {
                 </div>
               ) : (
                 <>
-                  <div className="space-y-3">
-                    {userTeams.slice(0, 3).map((team) => (
-                      <Link
+                  <div className="space-y-3 overflow-y-auto flex-1 pr-2 max-h-[400px] custom-scrollbar">
+                    {userTeams.map((team) => (
+                      <div
                         key={team.id}
-                        href={`/dashboard/team-results/${team.id}`}
-                        className="group block p-4 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 hover:border-amber-400/50 hover:shadow-lg hover:shadow-amber-400/20 transition-all duration-200 cursor-pointer"
+                        className="group relative p-4 bg-white/5 border border-white/10 rounded-xl hover:bg-white/10 hover:border-amber-400/50 hover:shadow-lg hover:shadow-amber-400/20 transition-all duration-200"
                       >
-                        <div className="flex justify-between items-center mb-2">
-                          <span className="text-white font-medium group-hover:text-amber-400 transition-colors">
-                            Week {team.match.week} • {team.match.status}
-                          </span>
-                          <span className="text-amber-400 font-bold group-hover:scale-110 transition-transform">
-                            {team.totalPoints.toFixed(1)} pts
-                          </span>
-                        </div>
-                        <div className="flex justify-between items-center">
-                          <p className="text-sm text-gray-400 group-hover:text-gray-300 transition-colors">
-                            {team.match.homeTeam.abbreviation} vs {team.match.awayTeam.abbreviation}
-                          </p>
-                          <span className="text-amber-400 text-xs group-hover:translate-x-1 transition-transform">
-                            View Results →
-                          </span>
-                        </div>
-                      </Link>
+                        <Link
+                          href={`/dashboard/team-results/${team.id}`}
+                          className="block pr-10"
+                        >
+                          <div className="flex justify-between items-center mb-2">
+                            <span className="text-white font-medium group-hover:text-amber-400 transition-colors">
+                              Week {team.match.week} • {team.match.status}
+                            </span>
+                            <span className="text-amber-400 font-bold group-hover:scale-110 transition-transform">
+                              {team.totalPoints.toFixed(1)} pts
+                            </span>
+                          </div>
+                          <div className="flex justify-between items-center">
+                            <p className="text-sm text-gray-400 group-hover:text-gray-300 transition-colors">
+                              {team.match.awayTeam.abbreviation} @ {team.match.homeTeam.abbreviation}
+                            </p>
+                            <span className="text-amber-400 text-xs group-hover:translate-x-1 transition-transform">
+                              View Results →
+                            </span>
+                          </div>
+                        </Link>
+                        <button
+                          onClick={(e) => handleDeleteTeam(team.id, e)}
+                          disabled={deletingTeamId === team.id}
+                          className="absolute top-3 right-3 p-1.5 rounded-lg bg-red-500/20 text-red-400 hover:bg-red-500/30 hover:text-red-300 transition-all duration-200 opacity-60 hover:opacity-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                          title="Delete team"
+                        >
+                          {deletingTeamId === team.id ? (
+                            <div className="h-4 w-4 animate-spin rounded-full border-2 border-red-400 border-t-transparent"></div>
+                          ) : (
+                            <Trash2 className="h-4 w-4" />
+                          )}
+                        </button>
+                      </div>
                     ))}
                   </div>
                   <Link
                     href="/dashboard/matches"
-                    className="block mt-6 w-full py-3 bg-gradient-to-r from-amber-400 to-orange-500 text-slate-900 font-bold text-center rounded-xl hover:from-amber-300 hover:to-orange-400 transform hover:scale-105 transition-all duration-200 shadow-lg"
+                    className="block mt-6 w-full py-3 bg-gradient-to-r from-amber-400 to-orange-500 text-slate-900 font-bold text-center rounded-xl hover:from-amber-300 hover:to-orange-400 transform hover:scale-105 transition-all duration-200 shadow-lg flex-shrink-0"
                   >
                     Create New Team
                   </Link>

@@ -3,6 +3,7 @@ import { prisma } from '@/lib/db/prisma';
 import { getServerSession } from 'next-auth';
 import { authOptions } from '@/lib/auth';
 import { z } from 'zod';
+import { ensureMatchStats } from '@/lib/scoring';
 
 const createTeamSchema = z.object({
   matchId: z.string(),
@@ -143,6 +144,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Check if match is FINAL (past match) - if so, ensure stats exist
+    const match = await prisma.match.findUnique({
+      where: { id: validatedData.matchId },
+      select: { status: true },
+    });
+
+    if (match?.status === 'FINAL') {
+      // For past matches, ensure player stats exist (for testing purposes)
+      await ensureMatchStats(prisma, validatedData.matchId);
+    }
+
     // Create user team with players
     const userTeam = await prisma.userTeam.create({
       data: {
@@ -175,6 +187,35 @@ export async function POST(request: NextRequest) {
         },
       },
     });
+
+    // Calculate and set initial total points if match is FINAL
+    if (match?.status === 'FINAL') {
+      // Get player stats for this team's players
+      const playerStats = await Promise.all(
+        userTeam.players.map(async (utp) => {
+          const stat = await prisma.playerStat.findFirst({
+            where: {
+              playerId: utp.playerId,
+              matchId: validatedData.matchId,
+            },
+          });
+          return stat;
+        })
+      );
+
+      const totalPoints = playerStats.reduce((sum, stat) => {
+        return sum + (stat?.fantasyPoints || 0);
+      }, 0);
+
+      // Update the team with calculated points
+      await prisma.userTeam.update({
+        where: { id: userTeam.id },
+        data: { totalPoints: Math.round(totalPoints * 10) / 10 },
+      });
+
+      // Update the userTeam object to reflect the new totalPoints
+      userTeam.totalPoints = Math.round(totalPoints * 10) / 10;
+    }
 
     return NextResponse.json({ userTeam }, { status: 201 });
   } catch (error) {

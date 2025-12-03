@@ -1,4 +1,5 @@
 import { PlayerStat } from '@prisma/client';
+import { generatePlayerStats } from './smart-simulation';
 
 /**
  * Calculate fantasy points based on player statistics
@@ -164,6 +165,92 @@ export async function updateUserTeamPoints(
       },
     });
   }
+}
+
+/**
+ * Ensure player stats exist for a match (generate simulated stats if missing)
+ * This is used for testing purposes when creating teams for past matches
+ */
+export async function ensureMatchStats(
+  prisma: any,
+  matchId: string
+): Promise<void> {
+  // Check if stats already exist for this match
+  const existingStats = await prisma.playerStat.findFirst({
+    where: { matchId },
+  });
+  
+  if (existingStats) {
+    // Stats already exist, nothing to do
+    return;
+  }
+  
+  // Get match details
+  const match = await prisma.match.findUnique({
+    where: { id: matchId },
+    include: {
+      homeTeam: {
+        include: {
+          players: {
+            where: { status: 'ACTIVE' },
+          },
+        },
+      },
+      awayTeam: {
+        include: {
+          players: {
+            where: { status: 'ACTIVE' },
+          },
+        },
+      },
+    },
+  });
+  
+  if (!match) {
+    console.warn(`Match ${matchId} not found`);
+    return;
+  }
+  
+  // Only generate stats for FINAL matches with scores
+  if (match.status !== 'FINAL' || match.homeScore === null || match.awayScore === null) {
+    return;
+  }
+  
+  const homeScore = match.homeScore;
+  const awayScore = match.awayScore;
+  
+  // Generate stats for home team players
+  for (const player of match.homeTeam.players) {
+    const stats = generatePlayerStats(player.position, homeScore, awayScore);
+    const fantasyPoints = calculateFantasyPoints(stats);
+    
+    await prisma.playerStat.create({
+      data: {
+        playerId: player.id,
+        matchId: matchId,
+        ...stats,
+        fantasyPoints,
+      },
+    });
+  }
+  
+  // Generate stats for away team players
+  for (const player of match.awayTeam.players) {
+    const stats = generatePlayerStats(player.position, awayScore, homeScore);
+    const fantasyPoints = calculateFantasyPoints(stats);
+    
+    await prisma.playerStat.create({
+      data: {
+        playerId: player.id,
+        matchId: matchId,
+        ...stats,
+        fantasyPoints,
+      },
+    });
+  }
+  
+  // Update user team scores for this match
+  await updateUserTeamPoints(prisma, matchId);
 }
 
 /**
