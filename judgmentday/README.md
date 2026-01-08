@@ -25,8 +25,8 @@ JudgmentDay lets you draft fantasy teams for NFL games with a salary cap, compet
 
 ```bash
 # Clone and install
-git clone https://github.com/neu-cs4530/project-fall25-PrajwalpGM256.git
-cd project-fall25-PrajwalpGM256/judgmentday
+git clone git@github.com:PrajwalpGM256/JudgementDay.git
+cd JudgementDay
 npm install
 ```
 
@@ -162,8 +162,4 @@ After running seed:
 ## Links
 
 - [Live Demo](https://judgmentday.vercel.app/)
-- [Figma Designs](https://www.figma.com/design/qwO4AwCitaWPWiEMeJCT2G/JudgementDay?node-id=0-1&t=ubbroK396GKiGLhV-1)
-
----
-
-Built for INFO 6150 Web Design & User Experience Engineering @ Northeastern
+- [Figma Designs](https://www.figma.com/design/qwO4AwCitaWPWiEMeJCT2G/JudgementDay?node-id=0-1)
